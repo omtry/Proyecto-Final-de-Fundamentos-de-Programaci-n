@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookey - Reservar Sala</title>
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-light: #E6F0FF;
+            --background: #F5F6FA;
+            --card: #FFFFFF;
+            --text: #1E1E1E;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --accent: #F59E0B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.25rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* Booking Section */
+        .booking-section {
+            background-color: var(--card);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        /* Room Info */
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: var(--primary-light);
+            border-radius: 12px;
+        }
+
+        .room-icon {
+            font-size: 3rem;
+        }
+
+        .room-details h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .room-features {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .feature-tag {
+            background-color: var(--card);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--card);
+            color: var(--text);
+        }
+
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Time Slots */
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .time-slot {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-slot:hover {
+            border-color: var(--primary);
+        }
+
+        .time-slot.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .time-slot.unavailable {
+            background-color: var(--border);
+            color: var(--text-light);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Button and Hours Container */
+        .button-hours-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+            margin-top: 1rem;
+        }
+
+        /* CTA Button */
+        .cta-section {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .cta-button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+            width: 100%;
+        }
+
+        .cta-button:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 102, 255, 0.4);
+        }
+
+        .cta-button:disabled {
+            background-color: var(--border);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Hours Info for Mobile Layout */
+        .hours-info-mobile {
+            background-color: var(--card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background-color: var(--card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .hours-list {
+            list-style: none;
+        }
+
+        .hours-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-light);
+        }
+
+        .hours-list li:last-child {
+            border-bottom: none;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Booking Summary */
+        .booking-summary {
+            background-color: var(--primary-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-label {
+            color: var(--text-light);
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* Hide the original hours card in sidebar on desktop */
+        @media (min-width: 1024px) {
+            .sidebar .info-card:first-child {
+                display: none;
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 1023px) {
+            .button-hours-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .hours-info-mobile {
+                display: none;
+            }
+            
+            /* Show original hours card in sidebar on mobile */
+            .sidebar .info-card:first-child {
+                display: block;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .room-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .nav-link {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">Bookey</div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Principal</a>
+                <a href="/rooms" class="nav-link">Salas</a>
+                <a href="/profile" class="nav-link">Perfil</a>
+                <a href="/about" class="nav-link">About us</a>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1 class="hero-title">RESERVAR SALA DE MENTORÍA</h1>
+            <p class="hero-subtitle">Selecciona la fecha y horario para tu sesión</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-grid">
+            <!-- Booking Section -->
+            <div class="booking-section">
+                <h2 class="section-title">Completa tu Reserva</h2>
+                
+                <!-- Room Information -->
+                <div class="room-info">
+                    <div class="room-icon">📚</div>
+                    <div class="room-details">
+                        <h3>Sala de Mentoría 1</h3>
+                        <div class="room-features">
+                            <span class="feature-tag">Capacidad: 6 personas</span>
+                            <span class="feature-tag">TV para presentaciones</span>
+                            <span class="feature-tag">Sofá cómodo</span>
+                            <span class="feature-tag">Mesas de trabajo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="booking-form">
+                    <!-- Duration -->
+                    <div class="form-group">
+                        <label class="form-label">Duración</label>
+                        <select class="form-select" id="duration" required>
+                            <option value="">Selecciona duración</option>
+                            <option value="1">1 hora</option>
+                            <option value="1.5">1.5 horas</option>
+                            <option value="2">2 horas</option>
+                        </select>
+                    </div>
+
+                    <!-- Time Slots -->
+                    <div class="form-group">
+                        <label class="form-label">Horario Disponible</label>
+                        <div class="time-slots">
+                            <div class="time-slot" data-time="07:00">7:00 AM</div>
+                            <div class="time-slot" data-time="08:00">8:00 AM</div>
+                            <div class="time-slot" data-time="09:00">9:00 AM</div>
+                            <div class="time-slot" data-time="10:00">10:00 AM</div>
+                            <div class="time-slot" data-time="11:00">11:00 AM</div>
+                            <div class="time-slot" data-time="12:00">12:00 PM</div>
+                            <div class="time-slot" data-time="13:00">1:00 PM</div>
+                            <div class="time-slot" data-time="14:00">2:00 PM</div>
+                            <div class="time-slot" data-time="15:00">3:00 PM</div>
+                            <div class="time-slot unavailable" data-time="16:00">4:00 PM</div>
+                            <div class="time-slot" data-time="17:00">5:00 PM</div>
+                        </div>
+                    </div>
+
+                    <!-- Button and Hours Side by Side -->
+                    <div class="button-hours-container">
+                        <div class="cta-section">
+                            <button type="submit" class="cta-button" id="confirm-booking">
+                                Confirmar Reserva
+                            </button>
+                        </div>
+                        
+                        <!-- Hours Info Moved Here -->
+                        <div class="hours-info-mobile">
+                            <h3 class="info-title">Horarios de Disponibilidad</h3>
+                            <ul class="hours-list">
+                                <li><span class="highlight">Lunes a Viernes:</span> 7:00 AM - 6:00 PM</li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Hours Card (Hidden on desktop, shown on mobile) -->
+                <div class="info-card">
+                    <h3 class="info-title">Horarios de Disponibilidad</h3>
+                    <ul class="hours-list">
+                        <li><span class="highlight">Lunes a Viernes:</span> 7:00 AM - 6:00 PM</li>
+                    </ul>
+                </div>
+
+                <!-- Booking Summary -->
+                <div class="info-card">
+                    <h3 class="info-title">Resumen de tu Reserva</h3>
+                    <div class="booking-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Sala:</span>
+                            <span class="summary-value">Sala de Mentoría 1</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Horario:</span>
+                            <span class="summary-value" id="summary-time">--:-- --</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Duración:</span>
+                            <span class="summary-value" id="summary-duration">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Info Card -->
+                <div class="info-card">
+                    <h3 class="info-title">Información Importante</h3>
+                    <ul class="hours-list">
+                        <li><span class="highlight">Capacidad:</span> 6 personas máximo</li>
+                        <li><span class="highlight">Reserva:</span> 2 horas máximo</li>
+                        <li><span class="highlight">Recursos:</span> TV, mesas, sillas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Time Slot Selection
+        const timeSlots = document.querySelectorAll('.time-slot:not(.unavailable)');
+        timeSlots.forEach(slot => {
+            slot.addEventListener('click', function() {
+                timeSlots.forEach(s => s.classList.remove('selected'));
+                this.classList.add('selected');
+                updateSummary();
+            });
+        });
+
+        // Form Elements
+        const durationSelect = document.getElementById('duration');
+
+        // Update summary when form changes
+        durationSelect.addEventListener('change', updateSummary);
+
+        // Update Booking Summary
+        function updateSummary() {
+            const selectedTime = document.querySelector('.time-slot.selected')?.getAttribute('data-time');
+            const selectedDuration = durationSelect.value;
+
+            document.getElementById('summary-time').textContent = selectedTime ? formatTime(selectedTime) : '--:-- --';
+            document.getElementById('summary-duration').textContent = selectedDuration ? `${selectedDuration} hora${selectedDuration > 1 ? 's' : ''}` : '--';
+        }
+
+        // Format time for display
+        function formatTime(timeString) {
+            const [hours, minutes] = timeString.split(':');
+            const hour = parseInt(hours);
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour % 12 || 12;
+            return `${displayHour}:${minutes} ${period}`;
+        }
+
+        // Form Submission
+        document.getElementById('booking-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const selectedTime = document.querySelector('.time-slot.selected');
+            const duration = durationSelect.value;
+
+            if (!selectedTime || !duration) {
+                alert('Por favor, selecciona un horario y una duración para tu reserva.');
+                return;
+            }
+
+            // Simulate successful booking
+            alert('¡Reserva confirmada exitosamente! Recibirás un correo de confirmación con los detalles de tu reserva.');
+            
+            // Reset form
+            this.reset();
+            timeSlots.forEach(slot => slot.classList.remove('selected'));
+            updateSummary();
+        });
+
+        // Initialize summary
+        updateSummary();
+    </script>
+</body>
+</html>
