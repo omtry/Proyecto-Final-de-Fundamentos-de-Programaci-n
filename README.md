@@ -32,20 +32,6 @@ Los usuarios pueden iniciar sesión, consultar disponibilidad y reservar una sal
 
 ---
 
-## ⚙️ Configuración del proyecto
-
-1. Crea un proyecto en **Firebase**.  
-2. Habilita los métodos de autenticación:
-   - **Email/Password**
-   - **Google**
-3. Activa **Cloud Firestore** para almacenar usuarios y reservas.
-4. Crea una **app web** dentro de tu proyecto de Firebase y configura las credenciales necesarias en un archivo `.env`.
-
-> ⚠️ **Importante:** No compartas tu archivo `.env` en repositorios públicos.  
-> Mantén tus credenciales seguras utilizando `.gitignore`.
-
----
-
 ## ▶️ Ejecución
 
 Instala las dependencias del proyecto:
