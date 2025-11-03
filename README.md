@@ -1,40 +1,26 @@
-# 🎓 BK Mentorías — Sistema de Reservas de Salas
+## BK Login App (Expo + Web + Firebase)
 
-**BK Mentorías** es una aplicación desarrollada con **React Native** que permite gestionar y reservar **salas de mentoría** de forma sencilla, rápida y accesible.  
-El sistema facilita la conexión entre estudiantes y mentores, permitiendo coordinar reuniones académicas en horarios disponibles.
+### Setup
 
----
+1. Crea un proyecto en Firebase y habilita Authentication (Email/Password y Google) y Firestore.
+2. Crea una app web en Firebase y copia la configuración.
+3. Crea un archivo `.env` en la raíz con:
+```
+EXPO_PUBLIC_FIREBASE_API_KEY=...
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+EXPO_PUBLIC_FIREBASE_SENDER_ID=...
+EXPO_PUBLIC_FIREBASE_APP_ID=...
+```
 
-## 🧭 Descripción general
-
-El proyecto fue diseñado como una herramienta para **organizar mentorías académicas**, optimizando el uso de las salas y el tiempo de los participantes.  
-Los usuarios pueden iniciar sesión, consultar disponibilidad y reservar una sala de mentoría según la fecha y hora deseada.
-
----
-
-## ✨ Funcionalidades principales
-
-- 🔐 **Autenticación de usuarios** mediante Firebase (Email/Password y Google)
-- 🗓️ **Reserva de salas** por fecha y hora
-- 📋 **Visualización de disponibilidad** en tiempo real
-- 💾 **Registro automático de usuarios** en Firestore
-- 🔄 **Persistencia de sesión**
----
-
-## 🛠️ Tecnologías utilizadas
-
-| Tecnología | Uso principal |
-|-------------|----------------|
-| **React Native (Expo)** | Desarrollo de la interfaz y compatibilidad multiplataforma |
-| **Firebase Authentication** | Inicio de sesión y control de acceso |
-| **Firebase Firestore** | Base de datos para reservas y usuarios |
-| **React Navigation / Expo Router** | Navegación entre pantallas |
-
----
-
-## ▶️ Ejecución
-
-Instala las dependencias del proyecto:
+### Ejecutar
 
 ```bash
-npm install
+npm run web
+# o
+npm start
+```
+
+La pantalla de login permite email/contraseña y Google. Al primer inicio guarda `uid`, `email`, `displayName` en Firestore. La sesión se mantiene activa.
+
