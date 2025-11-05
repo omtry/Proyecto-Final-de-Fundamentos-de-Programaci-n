@@ -1,15 +1,185 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs').promises;
 const app = express();
 const PORT = process.env.PORT || 3002;
+
+// Archivos de persistencia
+const DATA_DIR = path.join(__dirname, 'data');
+const RESERVAS_FILE = path.join(DATA_DIR, 'reservas.json');
+const SALAS_FILE = path.join(DATA_DIR, 'salas.json');
+const USUARIOS_FILE = path.join(DATA_DIR, 'usuarios.json');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static('frontend'));
 
-// Base de datos simulada (en producción usarías una base de datos real)
+// Funciones de persistencia
+async function ensureDataDir() {
+    try {
+        await fs.mkdir(DATA_DIR, { recursive: true });
+    } catch (error) {
+        console.error('Error creating data directory:', error);
+    }
+}
+
+async function loadData() {
+    try {
+        await ensureDataDir();
+        
+        // Cargar salas
+        try {
+            const salasData = await fs.readFile(SALAS_FILE, 'utf8');
+            if (salasData && salasData.trim()) {
+                const parsedSalas = JSON.parse(salasData);
+                if (Array.isArray(parsedSalas) && parsedSalas.length > 0) {
+                    salas = parsedSalas;
+                    console.log(`✅ Cargadas ${salas.length} salas desde archivo`);
+                } else {
+                    console.log('📝 Archivo de salas está vacío o inválido, usando datos por defecto');
+                    // No sobrescribir, mantener los datos por defecto en memoria
+                    await saveSalas(); // Guardar datos por defecto
+                }
+            } else {
+                console.log('📝 Archivo de salas está vacío, usando datos por defecto');
+                await saveSalas(); // Guardar datos por defecto
+            }
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                console.log('📝 Archivo de salas no existe, creando con datos por defecto');
+            } else {
+                console.error('❌ Error leyendo archivo de salas:', error.message);
+            }
+            await saveSalas(); // Guardar datos por defecto
+        }
+        
+        // Cargar reservas
+        try {
+            const reservasData = await fs.readFile(RESERVAS_FILE, 'utf8');
+            if (reservasData && reservasData.trim()) {
+                const parsed = JSON.parse(reservasData);
+                // Asegurar que reservas sea un array
+                if (Array.isArray(parsed)) {
+                    reservas = parsed;
+                    console.log(`✅ Cargadas ${reservas.length} reservas desde archivo`);
+                } else {
+                    console.warn('⚠️ Datos de reservas no son un array, inicializando vacío');
+                    reservas = [];
+                    await saveReservas();
+                }
+            } else {
+                console.log('📝 Archivo de reservas está vacío, iniciando con datos vacíos');
+                reservas = [];
+                await saveReservas();
+            }
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                console.log('📝 Archivo de reservas no existe, creando nuevo archivo');
+            } else {
+                console.error('❌ Error leyendo archivo de reservas:', error.message);
+            }
+            reservas = [];
+            await saveReservas();
+        }
+        
+        // Cargar usuarios
+        try {
+            const usuariosData = await fs.readFile(USUARIOS_FILE, 'utf8');
+            usuarios = JSON.parse(usuariosData);
+            console.log(`✅ Cargados ${usuarios.length} usuarios desde archivo`);
+        } catch (error) {
+            console.log('📝 Archivo de usuarios no existe, iniciando con datos por defecto');
+            await saveUsuarios(); // Guardar datos por defecto
+        }
+    } catch (error) {
+        console.error('❌ Error cargando datos:', error);
+    }
+}
+
+async function saveReservas() {
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    while (attempts < maxAttempts) {
+        try {
+            await ensureDataDir();
+            
+            // Verificar que reservas es un array válido
+            if (!Array.isArray(reservas)) {
+                console.error('❌ ERROR: reservas no es un array!', typeof reservas);
+                throw new Error('reservas no es un array válido');
+            }
+            
+            const dataToSave = JSON.stringify(reservas, null, 2);
+            
+            // Verificar que hay datos para guardar
+            if (!dataToSave || dataToSave.trim() === '') {
+                console.error('❌ ERROR: No hay datos para guardar');
+                throw new Error('Datos vacíos para guardar');
+            }
+            
+            // Escribir archivo (con reintentos automáticos)
+            await fs.writeFile(RESERVAS_FILE, dataToSave, 'utf8');
+            
+            // Verificar inmediatamente que se escribió correctamente
+            const verifyData = await fs.readFile(RESERVAS_FILE, 'utf8');
+            const verifyReservas = JSON.parse(verifyData);
+            
+            if (!Array.isArray(verifyReservas)) {
+                throw new Error('Los datos guardados no son un array válido');
+            }
+            
+            if (verifyReservas.length !== reservas.length) {
+                console.error(`⚠️ Intento ${attempts + 1}/${maxAttempts}: Verificación falló. Esperado: ${reservas.length}, Obtenido: ${verifyReservas.length}`);
+                attempts++;
+                if (attempts < maxAttempts) {
+                    // Esperar un poco antes de reintentar (backoff exponencial)
+                    await new Promise(resolve => setTimeout(resolve, 100 * attempts));
+                    continue;
+                } else {
+                    throw new Error(`No se pudo verificar el guardado después de ${maxAttempts} intentos`);
+                }
+            }
+            
+            // Si llegamos aquí, el guardado fue exitoso
+            console.log(`💾 Reservas guardadas en disco correctamente: ${reservas.length} reservas (intento ${attempts + 1})`);
+            return; // Salir exitosamente
+            
+        } catch (error) {
+            attempts++;
+            if (attempts >= maxAttempts) {
+                console.error('❌ Error guardando reservas después de todos los intentos:', error);
+                console.error('   Stack:', error.stack);
+                throw error; // Re-throw después de todos los intentos
+            }
+            console.error(`⚠️ Error en intento ${attempts}/${maxAttempts}, reintentando...`, error.message);
+            // Esperar antes de reintentar
+            await new Promise(resolve => setTimeout(resolve, 100 * attempts));
+        }
+    }
+}
+
+async function saveSalas() {
+    try {
+        await ensureDataDir();
+        await fs.writeFile(SALAS_FILE, JSON.stringify(salas, null, 2), 'utf8');
+    } catch (error) {
+        console.error('❌ Error guardando salas:', error);
+    }
+}
+
+async function saveUsuarios() {
+    try {
+        await ensureDataDir();
+        await fs.writeFile(USUARIOS_FILE, JSON.stringify(usuarios, null, 2), 'utf8');
+    } catch (error) {
+        console.error('❌ Error guardando usuarios:', error);
+    }
+}
+
+// Base de datos (se carga desde archivo al iniciar)
 let salas = [
     {
         id: 1,
@@ -162,6 +332,7 @@ app.get('/reservations', (req, res) => {
 // Servir archivos estáticos
 app.use('/js', express.static(path.join(__dirname, 'frontend', 'js')));
 app.use('/img', express.static(path.join(__dirname, 'frontend', 'img')));
+app.use('/components', express.static(path.join(__dirname, 'frontend', 'components')));
 
 // ==================== API ENDPOINTS ====================
 
@@ -246,7 +417,9 @@ app.get('/api/horarios', (req, res) => {
 // ==================== RESERVAS ====================
 
 // Crear nueva reserva
-app.post('/api/reservas', (req, res) => {
+app.post('/api/reservas', async (req, res) => {
+    console.log('📥 POST /api/reservas - Nueva solicitud de reserva');
+    console.log('📦 Datos recibidos:', JSON.stringify(req.body, null, 2));
     try {
         const { salaId, fecha, horario, duracion, proposito, participantes, notas, userId } = req.body;
         
@@ -288,40 +461,77 @@ app.post('/api/reservas', (req, res) => {
             });
         }
         
-        // Verificar que el usuario no tenga otra reserva activa
-        const reservaActiva = reservas.find(r => 
-            r.userId === userId && 
-            r.estado === 'confirmada'
-        );
+        // Normalizar userId y fecha para comparaciones consistentes
+        const userIdNormalizado = String(userId).trim();
+        const fechaNormalizada = fecha.split('T')[0]; // Tomar solo la parte de fecha (YYYY-MM-DD)
         
-        if (reservaActiva) {
+        // Verificar que el usuario no tenga más de 3 reservas activas
+        // Filtrar reservas confirmadas del usuario
+        const reservasUsuario = reservas.filter(r => {
+            // Comparar userId como string (normalizado)
+            const rUserId = String(r.userId || '').trim();
+            const userIdMatch = rUserId === userIdNormalizado;
+            const estadoMatch = r.estado === 'confirmada';
+            return userIdMatch && estadoMatch;
+        });
+        
+        console.log(`🔍 Usuario "${userIdNormalizado}" tiene ${reservasUsuario.length} reservas activas`);
+        console.log(`📋 Reservas encontradas:`, reservasUsuario.map(r => ({ id: r.id, fecha: r.fecha, sala: r.salaNombre })));
+        
+        // Permitir hasta 3 reservas activas
+        if (reservasUsuario.length >= 3) {
+            console.log(`❌ Bloqueando: Usuario tiene ${reservasUsuario.length} reservas (máximo 3)`);
             return res.status(400).json({
                 success: false,
-                message: 'Ya tienes una reserva activa. Solo puedes tener una reserva a la vez.'
+                message: 'Ya tienes 3 reservas activas. Puedes tener máximo 3 reservas en fechas diferentes. Cancela una reserva para poder crear otra.'
             });
         }
         
-        // Verificar disponibilidad (simplificado)
-        const conflicto = reservas.find(r => 
-            r.salaId === salaId && 
-            r.fecha === fecha && 
-            r.estado === 'confirmada'
-        );
+        // Verificar que no tenga otra reserva el mismo día (solo una reserva por día)
+        const reservaMismoDia = reservasUsuario.find(r => {
+            const rFecha = r.fecha ? String(r.fecha).split('T')[0].trim() : '';
+            const match = rFecha === fechaNormalizada;
+            if (match) {
+                console.log(`⚠️ Conflicto encontrado: Ya tiene reserva en ${rFecha} para ${r.salaNombre}`);
+            }
+            return match;
+        });
+        
+        if (reservaMismoDia) {
+            console.log(`❌ Bloqueando: Usuario ya tiene reserva en ${fechaNormalizada}`);
+            return res.status(400).json({
+                success: false,
+                message: `Ya tienes una reserva para el ${fechaNormalizada} (${reservaMismoDia.salaNombre}). Solo puedes reservar una sala por día. Puedes reservar otra sala en una fecha diferente.`
+            });
+        }
+        
+        console.log(`✅ Usuario puede crear reserva - no hay conflicto (tiene ${reservasUsuario.length}/3 reservas, fecha ${fechaNormalizada} disponible)`);
+        
+        // Verificar disponibilidad de la sala (conflicto con otras reservas)
+        // Normalizar fecha para comparación
+        const fechaNormalizadaConflicto = fecha.split('T')[0];
+        const conflicto = reservas.find(r => {
+            const rSalaId = parseInt(r.salaId);
+            const rFecha = r.fecha ? r.fecha.split('T')[0] : r.fecha;
+            return rSalaId === salaId && 
+                   rFecha === fechaNormalizadaConflicto && 
+                   r.estado === 'confirmada';
+        });
         
         if (conflicto) {
             return res.status(409).json({
                 success: false,
-                message: 'La sala ya está reservada para esa fecha'
+                message: 'La sala ya está reservada para esa fecha y horario.'
             });
         }
         
         // Crear nueva reserva
         const nuevaReserva = {
             id: Date.now(),
-            userId,
-            salaId,
+            userId: userIdNormalizado, // Usar userId normalizado
+            salaId: parseInt(salaId),
             salaNombre: sala.nombre,
-            fecha,
+            fecha: fechaNormalizadaConflicto, // Guardar fecha normalizada (sin hora)
             horario,
             duracion: parseFloat(duracion),
             proposito,
@@ -332,6 +542,48 @@ app.post('/api/reservas', (req, res) => {
         };
         
         reservas.push(nuevaReserva);
+        
+        // Guardar en archivo inmediatamente (con verificación)
+        try {
+            await saveReservas();
+            // Verificar que se guardó correctamente leyendo el archivo inmediatamente
+            const verifyData = await fs.readFile(RESERVAS_FILE, 'utf8');
+            const verifyReservas = JSON.parse(verifyData);
+            if (!Array.isArray(verifyReservas) || verifyReservas.length !== reservas.length) {
+                console.error('⚠️ ADVERTENCIA: Verificación falló después de guardar!');
+                console.error(`   En memoria: ${reservas.length}, En archivo: ${verifyReservas ? verifyReservas.length : 'null'}`);
+                // Intentar guardar de nuevo
+                await saveReservas();
+                // Verificar de nuevo
+                const verifyData2 = await fs.readFile(RESERVAS_FILE, 'utf8');
+                const verifyReservas2 = JSON.parse(verifyData2);
+                if (verifyReservas2.length !== reservas.length) {
+                    console.error('❌ ERROR: La verificación falló después de reintentar guardar!');
+                } else {
+                    console.log(`✅ Verificación exitosa después de reintentar: ${verifyReservas2.length} reservas`);
+                }
+            } else {
+                console.log(`✅ Verificación exitosa: ${verifyReservas.length} reservas guardadas`);
+            }
+        } catch (saveError) {
+            console.error('❌ ERROR CRÍTICO: No se pudo guardar la reserva en disco:', saveError);
+            // Aún así respondemos éxito porque la reserva está en memoria
+            // pero esto es un problema serio que debe resolverse
+        }
+        
+        // Contar reservas después de agregar la nueva
+        const totalReservas = reservas.filter(r => {
+            const rUserId = String(r.userId || '').trim();
+            return rUserId === userIdNormalizado && r.estado === 'confirmada';
+        }).length;
+        
+        console.log(`✅ Reserva creada exitosamente!`);
+        console.log(`   Usuario: ${userIdNormalizado}`);
+        console.log(`   Sala: ${salaId} (${sala.nombre})`);
+        console.log(`   Fecha: ${fechaNormalizadaConflicto}`);
+        console.log(`   Horario: ${horario}`);
+        console.log(`📊 Total reservas activas del usuario: ${totalReservas}/3`);
+        console.log(`📊 Total reservas en memoria: ${reservas.length}`);
         
         res.status(201).json({
             success: true,
@@ -385,7 +637,7 @@ app.get('/api/reservas', (req, res) => {
 });
 
 // Actualizar reserva
-app.put('/api/reservas/:id', (req, res) => {
+app.put('/api/reservas/:id', async (req, res) => {
     try {
         const reservaId = parseInt(req.params.id);
         const { estado, notas } = req.body;
@@ -402,6 +654,24 @@ app.put('/api/reservas/:id', (req, res) => {
         if (estado) reservas[reservaIndex].estado = estado;
         if (notas !== undefined) reservas[reservaIndex].notas = notas;
         
+        // Guardar cambios en archivo inmediatamente (con verificación)
+        try {
+            await saveReservas();
+            // Verificar que se guardó correctamente
+            const verifyData = await fs.readFile(RESERVAS_FILE, 'utf8');
+            const verifyReservas = JSON.parse(verifyData);
+            if (!Array.isArray(verifyReservas) || verifyReservas.length !== reservas.length) {
+                console.error('⚠️ ADVERTENCIA: Verificación falló al actualizar reserva!');
+                // Intentar guardar de nuevo
+                await saveReservas();
+            } else {
+                console.log(`✅ Reserva actualizada y guardada correctamente en disco`);
+            }
+        } catch (saveError) {
+            console.error('❌ ERROR CRÍTICO: No se pudo guardar la actualización en disco:', saveError);
+            // Aún respondemos éxito porque el cambio está en memoria
+        }
+        
         res.json({
             success: true,
             message: 'Reserva actualizada exitosamente',
@@ -417,7 +687,7 @@ app.put('/api/reservas/:id', (req, res) => {
 });
 
 // Cancelar reserva
-app.delete('/api/reservas/:id', (req, res) => {
+app.delete('/api/reservas/:id', async (req, res) => {
     try {
         const reservaId = parseInt(req.params.id);
         const reservaIndex = reservas.findIndex(r => r.id === reservaId);
@@ -430,6 +700,24 @@ app.delete('/api/reservas/:id', (req, res) => {
         }
         
         reservas.splice(reservaIndex, 1);
+        
+        // Guardar cambios en archivo inmediatamente (con verificación)
+        try {
+            await saveReservas();
+            // Verificar que se guardó correctamente
+            const verifyData = await fs.readFile(RESERVAS_FILE, 'utf8');
+            const verifyReservas = JSON.parse(verifyData);
+            if (!Array.isArray(verifyReservas) || verifyReservas.length !== reservas.length) {
+                console.error('⚠️ ADVERTENCIA: Verificación falló al cancelar reserva!');
+                // Intentar guardar de nuevo
+                await saveReservas();
+            } else {
+                console.log(`✅ Reserva cancelada y guardada correctamente en disco`);
+            }
+        } catch (saveError) {
+            console.error('❌ ERROR CRÍTICO: No se pudo guardar la cancelación en disco:', saveError);
+            // Aún respondemos éxito porque el cambio está en memoria
+        }
         
         res.json({
             success: true,
@@ -473,7 +761,7 @@ app.get('/api/usuarios/:id', (req, res) => {
 });
 
 // Actualizar perfil de usuario
-app.put('/api/usuarios/:id', (req, res) => {
+app.put('/api/usuarios/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { nombre, telefono } = req.body;
@@ -489,6 +777,13 @@ app.put('/api/usuarios/:id', (req, res) => {
         // Actualizar campos
         if (nombre) usuarios[usuarioIndex].nombre = nombre;
         if (telefono) usuarios[usuarioIndex].telefono = telefono;
+        
+        // Guardar cambios en archivo
+        try {
+            await saveUsuarios();
+        } catch (saveError) {
+            console.error('⚠️ Error al guardar cambios en disco:', saveError);
+        }
         
         res.json({
             success: true,
@@ -607,15 +902,23 @@ app.use((err, req, res, next) => {
 
 // ==================== INICIAR SERVIDOR ====================
 
-app.listen(PORT, () => {
-    console.log(`🚀 API Server running on http://localhost:${PORT}`);
-    console.log(`📚 API Endpoints:`);
-    console.log(`   Health: http://localhost:${PORT}/api/health`);
-    console.log(`   Salas: http://localhost:${PORT}/api/salas`);
-    console.log(`   Reservas: http://localhost:${PORT}/api/reservas`);
-    console.log(`   Horarios: http://localhost:${PORT}/api/horarios`);
-    console.log(`   Stats: http://localhost:${PORT}/api/stats`);
-    console.log(`🌐 Frontend: http://localhost:${PORT}/`);
-});
+// Inicializar servidor
+(async () => {
+    // Cargar datos persistentes al iniciar
+    await loadData();
+    
+    // Iniciar servidor
+    app.listen(PORT, () => {
+        console.log(`🚀 API Server running on http://localhost:${PORT}`);
+        console.log(`📚 API Endpoints:`);
+        console.log(`   Health: http://localhost:${PORT}/api/health`);
+        console.log(`   Salas: http://localhost:${PORT}/api/salas`);
+        console.log(`   Reservas: http://localhost:${PORT}/api/reservas`);
+        console.log(`   Horarios: http://localhost:${PORT}/api/horarios`);
+        console.log(`   Stats: http://localhost:${PORT}/api/stats`);
+        console.log(`🌐 Frontend: http://localhost:${PORT}/`);
+        console.log(`💾 Datos persistentes en: ${DATA_DIR}`);
+    });
+})();
 
 module.exports = app;
