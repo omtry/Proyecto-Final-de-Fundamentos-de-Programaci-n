@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookey - Panel de Administración</title>
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-light: #E6F0FF;
+            --background: #F5F6FA;
+            --card: #FFFFFF;
+            --text: #1E1E1E;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --accent: #F59E0B;
+            --danger: #EF4444;
+            --success: #10B981;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .admin-badge {
+            background-color: var(--danger);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background-color: var(--card);
+            border-radius: var(--radius);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .admin-subtitle {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        /* Form Section */
+        .form-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Salas List */
+        .salas-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .sala-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .sala-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .sala-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .sala-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .sala-tipo {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .sala-description {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .sala-details {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .sala-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message-success {
+            background-color: #D1FAE5;
+            color: #059669;
+            border: 1px solid #10B981;
+        }
+
+        .message-error {
+            background-color: #FEE2E2;
+            color: #DC2626;
+            border: 1px solid #EF4444;
+        }
+
+        .access-denied {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .access-denied-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .access-denied h2 {
+            font-size: 2rem;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .access-denied p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .salas-list {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="/" class="logo">Bookey</a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Principal</a>
+                <a href="/rooms" class="nav-link">Salas</a>
+                <a href="/profile" class="nav-link">Perfil</a>
+                <span class="admin-badge">Admin</span>
+            </div>
+        </div>
+
+        <!-- Access Denied (hidden by default) -->
+        <div class="admin-panel access-denied" id="accessDenied" style="display: none;">
+            <div class="access-denied-icon">🔒</div>
+            <h2>Acceso Denegado</h2>
+            <p>No tienes permisos de administrador para acceder a esta página.</p>
+            <a href="/" class="btn btn-primary">Volver al inicio</a>
+        </div>
+
+        <!-- Admin Panel (shown if admin) -->
+        <div id="adminContent" style="display: none;">
+            <div class="admin-panel">
+                <h1 class="admin-title">Panel de Administración</h1>
+                <p class="admin-subtitle">Gestiona las salas de mentoría del sistema</p>
+
+                <!-- Messages -->
+                <div id="successMessage" class="message message-success"></div>
+                <div id="errorMessage" class="message message-error"></div>
+
+                <!-- Form Section -->
+                <div class="form-section">
+                    <h2 class="section-title">Crear Nueva Sala</h2>
+                    <form id="createSalaForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nombre" class="form-label">Nombre de la Sala *</label>
+                                <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Ej: Sala 208" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tipo" class="form-label">Tipo *</label>
+                                <input type="text" id="tipo" name="tipo" class="form-input" placeholder="Ej: Corporate, Cognata, etc." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="capacidad" class="form-label">Capacidad *</label>
+                                <input type="number" id="capacidad" name="capacidad" class="form-input" placeholder="Ej: 6" min="1" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="imagen" class="form-label">URL de Imagen</label>
+                                <input type="url" id="imagen" name="imagen" class="form-input" placeholder="https://...">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="descripcion" class="form-label">Descripción *</label>
+                            <textarea id="descripcion" name="descripcion" class="form-textarea" placeholder="Describe la sala y sus características..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="equipamiento" class="form-label">Equipamiento (separado por comas)</label>
+                            <input type="text" id="equipamiento" name="equipamiento" class="form-input" placeholder="WiFi, Proyector, Aire acondicionado">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="createBtn">
+                            Crear Sala
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Salas List Section -->
+                <div class="form-section">
+                    <h2 class="section-title">Gestionar Salas Existentes</h2>
+                    <div class="loading" id="loadingSalas">Cargando salas...</div>
+                    <div class="salas-list" id="salasList">
+                        <!-- Las salas se cargarán dinámicamente aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Auth Script -->
+    <script src="/js/auth.js"></script>
+    <!-- Include API Script -->
+    <script src="/js/api.js"></script>
+    
+    <script>
+        let currentUserId = null;
+
+        // Verificar acceso de admin
+        async function checkAdminAccess() {
+            // Esperar a que Firebase se inicialice
+            if (!window.auth || !window.auth.isAuthenticated()) {
+                document.getElementById('accessDenied').style.display = 'block';
+                return false;
+            }
+
+            const user = window.auth.getCurrentUser();
+            if (!user) {
+                document.getElementById('accessDenied').style.display = 'block';
+                return false;
+            }
+
+            currentUserId = user.uid;
+
+            // Verificar rol de admin
+            const isAdmin = window.auth.isAdmin();
+            
+            if (!isAdmin) {
+                // Intentar verificar desde Firestore
+                const role = await window.auth.getUserRoleFromFirestore(user.uid);
+                if (role !== 'admin') {
+                    document.getElementById('accessDenied').style.display = 'block';
+                    return false;
+                }
+            }
+
+            // Si es admin, mostrar contenido
+            document.getElementById('adminContent').style.display = 'block';
+            return true;
+        }
+
+        // Cargar salas
+        async function loadSalas() {
+            try {
+                const response = await window.api.getSalas();
+                if (response.success) {
+                    displaySalas(response.data);
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Error loading salas:', error);
+                showError('Error al cargar las salas: ' + error.message);
+            }
+        }
+
+        // Mostrar salas en la lista
+        function displaySalas(salas) {
+            const salasList = document.getElementById('salasList');
+            const loadingSalas = document.getElementById('loadingSalas');
+
+            if (salas.length === 0) {
+                salasList.innerHTML = '<p style="text-align: center; color: var(--text-light);">No hay salas registradas.</p>';
+                loadingSalas.style.display = 'none';
+                return;
+            }
+
+            loadingSalas.style.display = 'none';
+            salasList.innerHTML = salas.map(sala => `
+                <div class="sala-card">
+                    <div class="sala-header">
+                        <h3 class="sala-title">${sala.nombre}</h3>
+                        <span class="sala-tipo">${sala.tipo}</span>
+                    </div>
+                    <p class="sala-description">${sala.descripcion}</p>
+                    <div class="sala-details">
+                        <span>Capacidad: ${sala.capacidad}</span>
+                        <span>Equipos: ${sala.equipamiento.length}</span>
+                    </div>
+                    <div class="sala-actions">
+                        <button onclick="eliminarSala(${sala.id})" class="btn btn-danger">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Crear nueva sala
+        async function crearSala(e) {
+            e.preventDefault();
+
+            if (!currentUserId) {
+                showError('Debes estar autenticado para crear salas');
+                return;
+            }
+
+            const formData = {
+                userId: currentUserId,
+                nombre: document.getElementById('nombre').value.trim(),
+                tipo: document.getElementById('tipo').value.trim(),
+                descripcion: document.getElementById('descripcion').value.trim(),
+                capacidad: parseInt(document.getElementById('capacidad').value),
+                imagen: document.getElementById('imagen').value.trim() || undefined,
+                equipamiento: document.getElementById('equipamiento').value
+                    .split(',')
+                    .map(e => e.trim())
+                    .filter(e => e.length > 0) || ['WiFi', 'Proyector', 'Aire acondicionado']
+            };
+
+            // Validar campos requeridos
+            if (!formData.nombre || !formData.tipo || !formData.descripcion || !formData.capacidad) {
+                showError('Por favor completa todos los campos requeridos');
+                return;
+            }
+
+            const createBtn = document.getElementById('createBtn');
+            createBtn.disabled = true;
+            createBtn.textContent = 'Creando...';
+
+            try {
+                const response = await window.api.crearSala(formData);
+                if (response.success) {
+                    showSuccess('Sala creada exitosamente');
+                    document.getElementById('createSalaForm').reset();
+                    await loadSalas(); // Recargar lista
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Error creating sala:', error);
+                showError('Error al crear la sala: ' + error.message);
+            } finally {
+                createBtn.disabled = false;
+                createBtn.textContent = 'Crear Sala';
+            }
+        }
+
+        // Eliminar sala
+        async function eliminarSala(salaId) {
+            if (!currentUserId) {
+                showError('Debes estar autenticado para eliminar salas');
+                return;
+            }
+
+            if (!confirm('¿Estás seguro de que quieres eliminar esta sala? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            try {
+                const response = await window.api.eliminarSala(salaId, currentUserId);
+                if (response.success) {
+                    showSuccess('Sala eliminada exitosamente');
+                    await loadSalas(); // Recargar lista
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Error deleting sala:', error);
+                showError('Error al eliminar la sala: ' + error.message);
+            }
+        }
+
+        // Mostrar mensaje de éxito
+        function showSuccess(message) {
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            errorMsg.style.display = 'none';
+            successMsg.textContent = message;
+            successMsg.style.display = 'block';
+
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 5000);
+        }
+
+        // Mostrar mensaje de error
+        function showError(message) {
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            successMsg.style.display = 'none';
+            errorMsg.textContent = message;
+            errorMsg.style.display = 'block';
+
+            setTimeout(() => {
+                errorMsg.style.display = 'none';
+            }, 5000);
+        }
+
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Esperar a que Firebase se inicialice
+            setTimeout(async () => {
+                const hasAccess = await checkAdminAccess();
+                if (hasAccess) {
+                    await loadSalas();
+                    document.getElementById('createSalaForm').addEventListener('submit', crearSala);
+                }
+            }, 1000);
+        });
+
+        // Exportar funciones globalmente
+        window.eliminarSala = eliminarSala;
+    </script>
+</body>
+</html>
+
+

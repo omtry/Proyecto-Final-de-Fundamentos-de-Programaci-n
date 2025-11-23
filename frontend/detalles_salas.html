@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookey - Detalles de Salas</title>
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-light: #E6F0FF;
+            --background: #F5F6FA;
+            --card: #FFFFFF;
+            --text: #1E1E1E;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --accent: #F59E0B;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin: 2rem 0 3rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Rooms Grid */
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .room-card {
+            background-color: var(--card);
+            border-radius: var(--radius);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+        }
+
+        .room-content {
+            padding: 2rem;
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .room-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .room-type {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .room-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .room-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .room-features {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .features-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .features-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feature-badge {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--text-light);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .error-message {
+            background-color: #FEE2E2;
+            color: #DC2626;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-link {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .rooms-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .room-actions {
+                flex-direction: column;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="/" class="logo">Bookey</a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Principal</a>
+                <a href="/rooms" class="nav-link active">Salas</a>
+                <a href="/profile" class="nav-link" id="profileLink" style="display: none;">Perfil</a>
+                <a href="/about" class="nav-link">About us</a>
+                <div id="userInfo"></div>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1 class="hero-title">Salas Disponibles</h1>
+            <p class="hero-subtitle">Explora nuestros espacios y elige el perfecto para tu sesión de mentoría</p>
+        </div>
+
+        <!-- Rooms Container -->
+        <div id="rooms-container" class="loading">
+            Cargando salas...
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">Bookey</div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Instagram</a>
+                <a href="#" class="footer-link">Twitter</a>
+                <a href="#" class="footer-link">LinkedIn</a>
+                <a href="/about" class="footer-link">Contacto</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Include Auth Script -->
+    <script src="/js/auth.js"></script>
+    
+    <!-- Include API Client Script -->
+    <script src="/js/api.js"></script>
+    
+    <script>
+        // Navigation highlighting
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Load rooms from API with detailed view
+        async function loadRooms() {
+            const container = document.getElementById('rooms-container');
+            
+            try {
+                const response = await window.api.getSalas();
+                
+                if (response.success && response.data && response.data.length > 0) {
+                    container.innerHTML = '<div class="rooms-grid"></div>';
+                    const grid = container.querySelector('.rooms-grid');
+                    
+                    response.data.forEach(sala => {
+                        const salaCard = document.createElement('div');
+                        salaCard.className = 'room-card';
+                        
+                        const equipamiento = sala.equipamiento && Array.isArray(sala.equipamiento) 
+                            ? sala.equipamiento 
+                            : ['WiFi', 'Proyector', 'Aire Acondicionado'];
+                        
+                        salaCard.innerHTML = `
+                            <div class="room-content" style="display: flex; gap: 1.5rem; padding: 1.5rem;">
+                                <img src="${sala.imagen || ''}" alt="${sala.nombre}" style="width: 200px; height: 200px; border-radius: 12px; object-fit: cover; flex-shrink: 0;">
+                                <div class="room-info" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+                                    <div>
+                                        <h3 class="room-title" style="font-size: 1.5rem; font-weight: bold; color: #1E1E1E; margin: 0 0 0.75rem 0;">${sala.nombre || 'Sala'}</h3>
+                                        <p class="room-description" style="color: #6B7280; line-height: 1.6; font-size: 0.95rem; margin: 0;">
+                                            ${sala.descripcion || 'Sala disponible para sesiones de mentoría y aprendizaje colaborativo. Equipada con todo lo necesario para una experiencia productiva.'}
+                                        </p>
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+                                        <button onclick="reservarSala('${sala.id}')" class="btn" ${!sala.disponible ? 'disabled' : ''} style="background-color: #0066FF; color: white; border: none; border-radius: 0.75rem; padding: 0.75rem 1.5rem; font-weight: 600; cursor: pointer;">
+                                            Reservar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        grid.appendChild(salaCard);
+                    });
+                } else {
+                    container.innerHTML = '<div class="error-message">No hay salas disponibles en este momento.</div>';
+                }
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+                container.innerHTML = '<div class="error-message">Error al cargar las salas. Por favor, intenta más tarde.</div>';
+            }
+        }
+
+        // Function to reserve a room
+        function reservarSala(salaId) {
+            // Check authentication
+            if (!window.auth || !window.auth.isAuthenticated()) {
+                alert('Debes iniciar sesión para reservar una sala');
+                window.location.href = '/login';
+                return;
+            }
+            
+            // Redirect to reservations page with sala ID
+            window.location.href = `/reservations?sala=${salaId}`;
+        }
+
+        // Update UI based on authentication
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (window.auth) {
+                    window.auth.updateUI();
+                    updateNavbar();
+                }
+                loadRooms();
+            }, 1000);
+        });
+
+        function updateNavbar() {
+            const profileLink = document.getElementById('profileLink');
+            const userInfo = document.getElementById('userInfo');
+            
+            if (window.auth && window.auth.isAuthenticated()) {
+                if (profileLink) profileLink.style.display = 'block';
+            } else {
+                if (profileLink) profileLink.style.display = 'none';
+                if (userInfo) userInfo.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+
+
