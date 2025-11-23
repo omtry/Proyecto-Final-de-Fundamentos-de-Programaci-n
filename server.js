@@ -48,7 +48,7 @@ let salas = [
     tipo: 'Cognata',
     descripcion: 'Espacio tecnológico para mentoría en programación y desarrollo de software. Equipada con estaciones de trabajo especializadas.',
     capacidad: 6,
-    imagen: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+    imagen: '/img/sala-204.jpeg',
     disponible: true,
     equipamiento: ['Computadoras', 'Monitores duales', 'WiFi', 'Software especializado']
   },
@@ -852,13 +852,9 @@ app.use('/js', express.static(path.join(__dirname, 'frontend', 'js')));
 app.use('/img', express.static(path.join(__dirname, 'frontend', 'img')));
 
 // NEW ROUTES - Add these
+// Redirigir /room-details a /rooms para mantener consistencia
 app.get('/room-details', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'detalles_salas.html'), (err) => {
-    if (err) {
-      console.error('Error serving detalles_salas.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
+  res.redirect('/rooms');
 });
 
 app.get('/reservations', (req, res) => {
@@ -909,7 +905,6 @@ app.listen(PORT, () => {
   console.log(`   Profile: http://localhost:${PORT}/profile`);
   console.log(`   Login: http://localhost:${PORT}/login`);
   console.log(`   Register: http://localhost:${PORT}/register`);
-  console.log(`   Room Details: http://localhost:${PORT}/room-details`);
   console.log(`   Reservations: http://localhost:${PORT}/reservations`);
   console.log(`📡 API Test: http://localhost:${PORT}/api/test`);
   console.log(`💾 Datos cargados: ${reservas.length} reservas, ${usuarios.length} usuarios`);
