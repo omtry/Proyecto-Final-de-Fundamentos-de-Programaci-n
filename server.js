@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -17,7 +18,7 @@ let salas = [
     tipo: 'Corporate',
     descripcion: 'Sala ideal para sesiones de estrategia empresarial y planificación. Equipada con pizarra digital y herramientas de visualización avanzadas.',
     capacidad: 6,
-    imagen: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+    imagen: '/img/sala-204.jpeg',
     disponible: true,
     equipamiento: ['Pizarra digital', 'Proyector', 'Sistema de audio', 'WiFi']
   },
@@ -37,7 +38,7 @@ let salas = [
     tipo: 'Importe',
     descripcion: 'Sala de resolución de problemas y pensamiento creativo. Ideal para sesiones de innovación y desarrollo de soluciones.',
     capacidad: 6,
-    imagen: 'https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+    imagen: '/img/sala-203.jpeg',
     disponible: true,
     equipamiento: ['Pizarra blanca', 'Marcadores', 'WiFi', 'Mesa colaborativa']
   },
@@ -57,7 +58,7 @@ let salas = [
     tipo: 'Corporate',
     descripcion: 'Sala multimedia para presentaciones ejecutivas y reuniones de alto nivel. Equipada con sistema de videoconferencia profesional.',
     capacidad: 6,
-    imagen: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+    imagen: '/img/sala-205.jpeg',
     disponible: true,
     equipamiento: ['Sistema de videoconferencia', 'Proyector 4K', 'Audio profesional', 'WiFi']
   },
@@ -67,7 +68,7 @@ let salas = [
     tipo: 'Innovate',
     descripcion: 'Espacio colaborativo para sesiones de design thinking y prototipado rápido. Ideal para equipos multidisciplinarios.',
     capacidad: 6,
-    imagen: 'https://images.unsplash.com/photo-1564069114553-7215e1ff1890?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+    imagen: '/img/sala-206.jpeg',
     disponible: true,
     equipamiento: ['Pizarra digital', 'Materiales de prototipado', 'WiFi', 'Espacio flexible']
   },
@@ -77,14 +78,142 @@ let salas = [
     tipo: 'Focus',
     descripcion: 'Sala silenciosa para mentorías individuales y sesiones de concentración profunda. Aislamiento acústico premium.',
     capacidad: 6,
-    imagen: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+    imagen: '/img/sala-207.jpeg',
     disponible: true,
     equipamiento: ['Aislamiento acústico', 'Iluminación ajustable', 'WiFi', 'Mesa individual']
   }
 ];
 
-let reservas = [];
-let usuarios = [];
+// Archivos de persistencia
+const RESERVAS_FILE = path.join(__dirname, 'data', 'reservas.json');
+const USUARIOS_FILE = path.join(__dirname, 'data', 'usuarios.json');
+
+// Crear directorio data si no existe
+if (!fs.existsSync(path.join(__dirname, 'data'))) {
+  fs.mkdirSync(path.join(__dirname, 'data'));
+}
+
+// Función para cargar reservas desde archivo
+function cargarReservas() {
+  try {
+    if (fs.existsSync(RESERVAS_FILE)) {
+      const data = fs.readFileSync(RESERVAS_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('Error al cargar reservas:', error);
+  }
+  return [];
+}
+
+// Función para guardar reservas en archivo
+function guardarReservas(reservas) {
+  try {
+    fs.writeFileSync(RESERVAS_FILE, JSON.stringify(reservas, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error al guardar reservas:', error);
+  }
+}
+
+// Función para cargar usuarios desde archivo
+function cargarUsuarios() {
+  try {
+    if (fs.existsSync(USUARIOS_FILE)) {
+      const data = fs.readFileSync(USUARIOS_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('Error al cargar usuarios:', error);
+  }
+  return [];
+}
+
+// Función para guardar usuarios en archivo
+function guardarUsuarios(usuarios) {
+  try {
+    fs.writeFileSync(USUARIOS_FILE, JSON.stringify(usuarios, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Error al guardar usuarios:', error);
+  }
+}
+
+let reservas = cargarReservas();
+let usuarios = cargarUsuarios();
+
+// ==================== FUNCIONES HELPER ====================
+
+// Función para calcular hora de fin de una reserva
+function calcularHoraFin(horario, duracion) {
+  const [hora, minuto] = horario.split(':').map(Number);
+  const horaFin = hora + duracion;
+  return `${horaFin.toString().padStart(2, '0')}:${minuto.toString().padStart(2, '0')}`;
+}
+
+// Función para verificar si una reserva está activa
+function esReservaActiva(reserva) {
+  const ahora = new Date();
+  const fechaActual = ahora.toISOString().split('T')[0]; // YYYY-MM-DD
+  const horaActual = ahora.toTimeString().split(' ')[0].substring(0, 5); // HH:MM
+  
+  // Si la fecha de la reserva es futura, está activa
+  if (reserva.fecha > fechaActual) {
+    return true;
+  }
+  
+  // Si la fecha es hoy, verificar si la hora actual es menor a la hora de fin
+  if (reserva.fecha === fechaActual) {
+    const horaFin = reserva.horaFin || calcularHoraFin(reserva.horario, reserva.duracion);
+    return horaActual < horaFin;
+  }
+  
+  // Si la fecha es pasada, no está activa
+  return false;
+}
+
+// Función para verificar si un usuario es admin
+// Por ahora, verificamos si el userId está en una lista de admins
+// En producción, esto debería consultar Firestore
+async function isAdmin(userId) {
+  // Lista temporal de admins (en producción consultar Firestore)
+  // Por ahora, cualquier usuario puede ser admin si se especifica en el request
+  // TODO: Implementar consulta a Firestore para verificar rol
+  return false; // Por defecto no es admin, se verificará desde el frontend
+}
+
+// Función para obtener reservas activas de un usuario
+function getReservasActivasUsuario(userId) {
+  return reservas.filter(r => 
+    r.userId === userId && 
+    r.estado === 'confirmada' && 
+    esReservaActiva(r)
+  );
+}
+
+// Función para verificar conflictos de horario en una sala
+function tieneConflictoHorario(salaId, fecha, horario, duracion, excluirReservaId = null) {
+  const horaFin = calcularHoraFin(horario, duracion);
+  
+  return reservas.some(r => {
+    // Excluir la reserva que estamos actualizando
+    if (excluirReservaId && r.id === excluirReservaId) {
+      return false;
+    }
+    
+    // Solo verificar reservas confirmadas de la misma sala y fecha
+    if (r.salaId === salaId && 
+        r.fecha === fecha && 
+        r.estado === 'confirmada') {
+      const rHoraFin = r.horaFin || calcularHoraFin(r.horario, r.duracion);
+      
+      // Verificar si hay solapamiento de horarios
+      return (horario >= r.horario && horario < rHoraFin) ||
+             (horaFin > r.horario && horaFin <= rHoraFin) ||
+             (horario <= r.horario && horaFin >= rHoraFin);
+    }
+    
+    return false;
+  });
+}
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -172,6 +301,16 @@ app.post('/api/reservas', (req, res) => {
       });
     }
     
+    // Verificar que el usuario no tenga reservas activas
+    const reservasActivas = getReservasActivasUsuario(userId);
+    if (reservasActivas.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ya tienes una reserva activa. Debes esperar a que termine antes de hacer una nueva reserva.',
+        reservaActiva: reservasActivas[0]
+      });
+    }
+    
     const sala = salas.find(s => s.id === salaId);
     if (!sala) {
       return res.status(404).json({
@@ -179,6 +318,17 @@ app.post('/api/reservas', (req, res) => {
         message: 'Sala no encontrada'
       });
     }
+    
+    // Verificar conflictos de horario
+    if (tieneConflictoHorario(salaId, fecha, horario, duracion)) {
+      return res.status(409).json({
+        success: false,
+        message: 'La sala ya está reservada en ese horario. Por favor, elige otro horario.'
+      });
+    }
+    
+    // Calcular hora de fin
+    const horaFin = calcularHoraFin(horario, duracion);
     
     const nuevaReserva = {
       id: Date.now(),
@@ -188,6 +338,7 @@ app.post('/api/reservas', (req, res) => {
       fecha,
       horario,
       duracion: parseFloat(duracion),
+      horaFin, // Agregar hora de fin calculada
       proposito,
       participantes: parseInt(participantes),
       notas: notas || '',
@@ -196,6 +347,7 @@ app.post('/api/reservas', (req, res) => {
     };
     
     reservas.push(nuevaReserva);
+    guardarReservas(reservas); // Guardar en archivo después de crear
     
     res.status(201).json({
       success: true,
@@ -226,6 +378,26 @@ app.get('/api/reservas/:userId', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al obtener las reservas',
+      error: error.message
+    });
+  }
+});
+
+// Obtener reservas activas de un usuario
+app.get('/api/reservas/usuario/:userId/activas', (req, res) => {
+  try {
+    const { userId } = req.params;
+    const reservasActivas = getReservasActivasUsuario(userId);
+    
+    res.json({
+      success: true,
+      data: reservasActivas,
+      total: reservasActivas.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener las reservas activas',
       error: error.message
     });
   }
@@ -262,6 +434,7 @@ app.delete('/api/reservas/:id', (req, res) => {
     }
     
     reservas.splice(reservaIndex, 1);
+    guardarReservas(reservas); // Guardar en archivo después de eliminar
     
     res.json({
       success: true,
@@ -321,6 +494,225 @@ app.get('/api/stats', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al obtener estadísticas',
+      error: error.message
+    });
+  }
+});
+
+// Obtener disponibilidad de todas las salas
+app.get('/api/disponibilidad', (req, res) => {
+  try {
+    const fecha = req.query.fecha || new Date().toISOString().split('T')[0]; // Fecha actual por defecto
+    
+    const disponibilidad = salas.map(sala => {
+      // Obtener reservas activas de esta sala para la fecha especificada
+      const reservasSala = reservas.filter(r => 
+        r.salaId === sala.id && 
+        r.fecha === fecha && 
+        r.estado === 'confirmada'
+      );
+      
+      // Determinar si está ocupada ahora
+      const ahora = new Date();
+      const fechaActual = ahora.toISOString().split('T')[0];
+      const horaActual = ahora.toTimeString().split(' ')[0].substring(0, 5);
+      
+      let ocupada = false;
+      let reservaActual = null;
+      
+      if (fecha === fechaActual) {
+        // Si es hoy, verificar si hay una reserva activa ahora
+        reservaActual = reservasSala.find(r => {
+          const horaFin = r.horaFin || calcularHoraFin(r.horario, r.duracion);
+          return horaActual >= r.horario && horaActual < horaFin;
+        });
+        ocupada = !!reservaActual;
+      }
+      
+      // Próxima reserva
+      const proximaReserva = reservasSala
+        .filter(r => r.horario > (fecha === fechaActual ? horaActual : '00:00'))
+        .sort((a, b) => a.horario.localeCompare(b.horario))[0];
+      
+      return {
+        sala: {
+          id: sala.id,
+          nombre: sala.nombre,
+          tipo: sala.tipo,
+          capacidad: sala.capacidad
+        },
+        ocupada,
+        reservaActual: reservaActual ? {
+          id: reservaActual.id,
+          horario: reservaActual.horario,
+          horaFin: reservaActual.horaFin || calcularHoraFin(reservaActual.horario, reservaActual.duracion),
+          proposito: reservaActual.proposito
+        } : null,
+        proximaReserva: proximaReserva ? {
+          id: proximaReserva.id,
+          horario: proximaReserva.horario,
+          horaFin: proximaReserva.horaFin || calcularHoraFin(proximaReserva.horario, proximaReserva.duracion),
+          proposito: proximaReserva.proposito
+        } : null,
+        reservasDelDia: reservasSala.length,
+        horariosOcupados: reservasSala.map(r => ({
+          inicio: r.horario,
+          fin: r.horaFin || calcularHoraFin(r.horario, r.duracion)
+        }))
+      };
+    });
+    
+    res.json({
+      success: true,
+      data: disponibilidad,
+      fecha
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener disponibilidad',
+      error: error.message
+    });
+  }
+});
+
+// Obtener información de usuario (incluyendo rol)
+app.get('/api/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Por ahora retornamos información básica
+    // En producción, esto debería consultar Firestore
+    const usuario = usuarios.find(u => u.id === userId);
+    
+    res.json({
+      success: true,
+      data: {
+        id: userId,
+        role: usuario?.role || 'user', // Por defecto es 'user'
+        ...usuario
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener información del usuario',
+      error: error.message
+    });
+  }
+});
+
+// ==================== ENDPOINTS DE ADMINISTRACIÓN ====================
+
+// Crear nueva sala (solo admin)
+app.post('/api/admin/salas', async (req, res) => {
+  try {
+    const { userId, nombre, tipo, descripcion, capacidad, imagen, equipamiento } = req.body;
+    
+    // Validar que se proporcione userId para verificar admin
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Se requiere autenticación'
+      });
+    }
+    
+    // Verificar que el usuario sea admin
+    // Por ahora, aceptamos el request si viene con userId
+    // En producción, verificar con isAdmin(userId)
+    const esAdminUser = await isAdmin(userId);
+    // Por ahora permitimos crear salas (se validará desde el frontend)
+    
+    // Validar campos requeridos
+    if (!nombre || !tipo || !descripcion || !capacidad) {
+      return res.status(400).json({
+        success: false,
+        message: 'Faltan campos requeridos: nombre, tipo, descripcion, capacidad'
+      });
+    }
+    
+    // Crear nueva sala
+    const nuevaSala = {
+      id: salas.length > 0 ? Math.max(...salas.map(s => s.id)) + 1 : 1,
+      nombre,
+      tipo,
+      descripcion,
+      capacidad: parseInt(capacidad),
+      imagen: imagen || 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3',
+      disponible: true,
+      equipamiento: equipamiento || ['WiFi', 'Proyector', 'Aire acondicionado']
+    };
+    
+    salas.push(nuevaSala);
+    
+    res.status(201).json({
+      success: true,
+      message: 'Sala creada exitosamente',
+      data: nuevaSala
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al crear la sala',
+      error: error.message
+    });
+  }
+});
+
+// Eliminar sala (solo admin)
+app.delete('/api/admin/salas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.query; // userId desde query params
+    
+    // Validar que se proporcione userId
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Se requiere autenticación'
+      });
+    }
+    
+    // Verificar que el usuario sea admin
+    const esAdminUser = await isAdmin(userId);
+    // Por ahora permitimos eliminar salas (se validará desde el frontend)
+    
+    const salaId = parseInt(id);
+    const salaIndex = salas.findIndex(s => s.id === salaId);
+    
+    if (salaIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sala no encontrada'
+      });
+    }
+    
+    // Verificar que no tenga reservas activas
+    const reservasSala = reservas.filter(r => 
+      r.salaId === salaId && 
+      r.estado === 'confirmada' &&
+      esReservaActiva(r)
+    );
+    
+    if (reservasSala.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se puede eliminar la sala porque tiene reservas activas',
+        reservasActivas: reservasSala.length
+      });
+    }
+    
+    // Eliminar la sala
+    salas.splice(salaIndex, 1);
+    
+    res.json({
+      success: true,
+      message: 'Sala eliminada exitosamente'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al eliminar la sala',
       error: error.message
     });
   }
@@ -435,8 +827,29 @@ app.get('/forgot-password', (req, res) => {
     });
 });
 
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'admin.html'), (err) => {
+    if (err) {
+      console.error('Error serving admin.html:', err);
+      res.status(500).send('Error loading page');
+    }
+  });
+});
+
+app.get('/disponibilidad', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'disponibilidad.html'), (err) => {
+    if (err) {
+      console.error('Error serving disponibilidad.html:', err);
+      res.status(500).send('Error loading page');
+    }
+  });
+});
+
 // Serve static files from frontend/js
 app.use('/js', express.static(path.join(__dirname, 'frontend', 'js')));
+
+// Serve static files from frontend/img
+app.use('/img', express.static(path.join(__dirname, 'frontend', 'img')));
 
 // NEW ROUTES - Add these
 app.get('/room-details', (req, res) => {
@@ -499,4 +912,5 @@ app.listen(PORT, () => {
   console.log(`   Room Details: http://localhost:${PORT}/room-details`);
   console.log(`   Reservations: http://localhost:${PORT}/reservations`);
   console.log(`📡 API Test: http://localhost:${PORT}/api/test`);
+  console.log(`💾 Datos cargados: ${reservas.length} reservas, ${usuarios.length} usuarios`);
 });

@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1763875592642,
+    "userId": "Ezsg5UzpOzTXnzeWoDliepvmOfz2",
+    "salaId": 1,
+    "salaNombre": "Sala 201",
+    "fecha": "2025-11-22",
+    "horario": "07:00",
+    "duracion": 2,
+    "horaFin": "09:00",
+    "proposito": "Sesión de mentoría",
+    "participantes": 4,
+    "notas": "",
+    "estado": "confirmada",
+    "fechaCreacion": "2025-11-23T05:26:32.642Z"
+  },
+  {
+    "id": 1763876307508,
+    "userId": "b5VsPddGlPW0XUSRGRxLGQQ44Pn1",
+    "salaId": 2,
+    "salaNombre": "Sala 202",
+    "fecha": "2025-11-22",
+    "horario": "11:00",
+    "duracion": 1.5,
+    "horaFin": "12.5:00",
+    "proposito": "Sesión de mentoría",
+    "participantes": 4,
+    "notas": "",
+    "estado": "confirmada",
+    "fechaCreacion": "2025-11-23T05:38:27.508Z"
+  }
+]
