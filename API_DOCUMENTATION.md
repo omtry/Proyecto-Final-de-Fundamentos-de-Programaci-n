@@ -5,7 +5,7 @@ API REST para el sistema de reservas de salas de mentoría Bookey. Proporciona e
 
 ## Base URL
 ```
-http://localhost:3002/api
+http://localhost:3001/api
 ```
 
 ## Endpoints
@@ -242,7 +242,7 @@ const reservas = await window.api.getReservasUsuario('user_123');
 ## Configuración
 
 ### Variables de Entorno
-- `PORT` - Puerto del servidor (default: 3002)
+- `PORT` - Puerto del servidor (default: 3001)
 - `NODE_ENV` - Entorno de ejecución (development/production)
 
 ### Instalación
@@ -252,12 +252,11 @@ npm install
 
 ### Ejecutar servidor
 ```bash
-npm run api-server
-```
-
-### Ejecutar en modo desarrollo
-```bash
-npm run dev-api
+npm start
+# o
+npm run server
+# o
+node server.js
 ```
 
 ## Notas Importantes

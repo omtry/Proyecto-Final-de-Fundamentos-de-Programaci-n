@@ -55,10 +55,10 @@
 ```
 frontend/
 ├── js/
-│   └── firebase-auth.js     # Sistema principal de autenticación
+│   └── auth.js             # Sistema principal de autenticación (Firebase + Google OAuth)
 ├── login.html               # Página de login/registro
 ├── index.html              # Página principal (pública)
-├── detalles_salas.html     # Lista de salas (pública)
+├── rooms.html              # Lista de salas (pública)
 ├── reservas.html           # Sistema de reservas (PROTEGIDA)
 └── ...
 ```

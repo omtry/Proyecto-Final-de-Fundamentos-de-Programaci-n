@@ -15,7 +15,7 @@ npm run server
 ```
 
 ### 3. Open your browser
-Visit `http://localhost:3000` to see the website.
+Visit `http://localhost:3001` to see the website.
 
 ## 📁 Project Structure
 
@@ -32,10 +32,10 @@ Proyecto-Final-de-Fundamentos-de-Programaci-n-main/
 
 ## 🌐 Website Routes
 
-- **Home**: `http://localhost:3000/` - Main landing page
-- **About**: `http://localhost:3000/about` - About us page
-- **Rooms**: `http://localhost:3000/rooms` - Rooms listing page
-- **Profile**: `http://localhost:3000/profile` - User profile page
+- **Home**: `http://localhost:3001/` - Main landing page
+- **About**: `http://localhost:3001/about` - About us page
+- **Rooms**: `http://localhost:3001/rooms` - Rooms listing page
+- **Profile**: `http://localhost:3001/profile` - User profile page
 
 ## 🔧 API Endpoints
 
@@ -127,7 +127,7 @@ The server can be deployed to any Node.js hosting service:
 ## 🔍 Troubleshooting
 
 ### Server won't start
-- Check if port 3000 is available
+- Check if port 3001 is available
 - Ensure all dependencies are installed with `npm install`
 
 ### Pages not loading

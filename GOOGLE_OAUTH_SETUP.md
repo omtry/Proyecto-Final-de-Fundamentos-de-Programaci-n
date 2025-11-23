@@ -20,8 +20,8 @@
 ### 3. Obtener el Client ID
 
 1. Copia el "Client ID" generado
-2. Abre el archivo `frontend/js/config.js`
-3. Reemplaza `YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com` con tu Client ID real
+2. Abre el archivo `frontend/js/auth.js`
+3. Busca la configuración de Google OAuth y actualiza el Client ID si es necesario
 
 ### 4. Configurar para producción
 
@@ -29,15 +29,14 @@ Para producción, actualiza las URIs en Google Cloud Console:
 - **Orígenes autorizados de JavaScript**: `https://tu-dominio.com`
 - **URIs de redirección autorizados**: `https://tu-dominio.com/auth/google/callback`
 
-Y actualiza el archivo `config.js` con la URL de producción.
+Y actualiza el archivo `auth.js` con la URL de producción si es necesario.
 
 ## Estructura de archivos
 
 ```
 frontend/
 ├── js/
-│   ├── config.js          # Configuración de la aplicación
-│   └── google-auth.js     # Lógica de autenticación de Google
+│   └── auth.js            # Sistema de autenticación (Firebase + Google OAuth)
 ├── auth/
 │   └── google/
 │       └── callback.html  # Página de callback de OAuth

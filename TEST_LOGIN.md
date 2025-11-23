@@ -49,10 +49,10 @@
 
 ### Archivos modificados:
 - `frontend/login.html` - Login restaurado y funcional
-- `frontend/js/google-auth.js` - Botón de cerrar sesión agregado
+- `frontend/js/auth.js` - Sistema de autenticación completo (Firebase + Google OAuth)
 - `frontend/reservas.html` - Header actualizado con userInfo
 - `frontend/index.html` - Ya tenía userInfo
-- `frontend/detalles_salas.html` - Ya tenía userInfo
+- `frontend/rooms.html` - Lista de salas con autenticación
 
 ### Estado actual:
 ✅ Login con email/contraseña funcional
