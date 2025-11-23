@@ -117,7 +117,7 @@ DELETE /api/admin/salas/:id  # Eliminar sala (solo admin)
 POST /api/validate-booking   # Validar horario de reserva
 ```
 
-Para más detalles, consulta [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
+Para más detalles, consulta [API_DOCUMENTATION.md](md/API_DOCUMENTATION.md)
 
 ## 🔐 Sistema de Autenticación
 
@@ -143,7 +143,7 @@ const firebaseConfig = {
 };
 ```
 
-Para configurar Google OAuth, consulta [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md)
+Para configurar Google OAuth, consulta [GOOGLE_OAUTH_SETUP.md](md/GOOGLE_OAUTH_SETUP.md)
 
 ## 🏢 Sistema de Salas
 
@@ -223,13 +223,13 @@ PORT=3001 node server.js
 
 ## 📚 Documentación Adicional
 
-- [API_DOCUMENTATION.md](API_DOCUMENTATION.md) - Documentación completa de la API
-- [README-WEBSITE.md](README-WEBSITE.md) - Guía del sitio web
-- [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) - Configuración de Google OAuth
-- [SISTEMA_AUTENTICACION_FINAL.md](SISTEMA_AUTENTICACION_FINAL.md) - Sistema de autenticación
-- [TEST_LOGIN.md](TEST_LOGIN.md) - Guía de pruebas de login
-- [ERRORES_CORREGIDOS.md](ERRORES_CORREGIDOS.md) - Historial de correcciones
-- [MEJORAS_IMPLEMENTADAS.md](MEJORAS_IMPLEMENTADAS.md) - Historial de mejoras
+- [API_DOCUMENTATION.md](md/API_DOCUMENTATION.md) - Documentación completa de la API
+- [README-WEBSITE.md](md/README-WEBSITE.md) - Guía del sitio web
+- [GOOGLE_OAUTH_SETUP.md](md/GOOGLE_OAUTH_SETUP.md) - Configuración de Google OAuth
+- [SISTEMA_AUTENTICACION_FINAL.md](md/SISTEMA_AUTENTICACION_FINAL.md) - Sistema de autenticación
+- [TEST_LOGIN.md](md/TEST_LOGIN.md) - Guía de pruebas de login
+- [ERRORES_CORREGIDOS.md](md/ERRORES_CORREGIDOS.md) - Historial de correcciones
+- [MEJORAS_IMPLEMENTADAS.md](md/MEJORAS_IMPLEMENTADAS.md) - Historial de mejoras
 
 ## 🐛 Solución de Problemas
 
