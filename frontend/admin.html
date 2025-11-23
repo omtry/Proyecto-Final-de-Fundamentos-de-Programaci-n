@@ -332,7 +332,7 @@
             <div class="nav-links">
                 <a href="/" class="nav-link">Principal</a>
                 <a href="/rooms" class="nav-link">Salas</a>
-                <a href="/profile" class="nav-link">Perfil</a>
+                <a href="/profile" class="nav-link" id="profileLink" style="display: none;">Perfil</a>
                 <span class="admin-badge">Admin</span>
             </div>
         </div>
@@ -604,6 +604,11 @@
         document.addEventListener('DOMContentLoaded', async function() {
             // Esperar a que Firebase se inicialice
             setTimeout(async () => {
+                // Actualizar UI de autenticación
+                if (window.auth) {
+                    window.auth.updateUI();
+                }
+                
                 const hasAccess = await checkAdminAccess();
                 if (hasAccess) {
                     await loadSalas();

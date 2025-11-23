@@ -75,7 +75,9 @@ async function initFirebase() {
 
 // Login con email y contraseña
 async function loginWithEmail(email, password) {
-    if (!auth || !firebaseAuth) return false;
+    if (!auth || !firebaseAuth) {
+        throw new Error('Firebase no está inicializado. Por favor, recarga la página.');
+    }
     
     try {
         const { signInWithEmailAndPassword } = firebaseAuth;
@@ -84,8 +86,27 @@ async function loginWithEmail(email, password) {
         return true;
     } catch (error) {
         console.error('Login error:', error);
-        alert('Error de login: ' + error.message);
-        return false;
+        
+        // Traducir errores de Firebase a mensajes más amigables
+        let errorMessage = 'Error al iniciar sesión. Por favor, intenta de nuevo.';
+        
+        if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+            errorMessage = 'Email o contraseña incorrectos. Por favor, verifica tus credenciales.';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = 'El formato del email no es válido.';
+        } else if (error.code === 'auth/user-disabled') {
+            errorMessage = 'Esta cuenta ha sido deshabilitada. Contacta al administrador.';
+        } else if (error.code === 'auth/too-many-requests') {
+            errorMessage = 'Demasiados intentos fallidos. Por favor, espera un momento antes de intentar de nuevo.';
+        } else if (error.code === 'auth/network-request-failed') {
+            errorMessage = 'Error de conexión. Por favor, verifica tu conexión a internet.';
+        } else if (error.message) {
+            // Si hay un mensaje personalizado, usarlo
+            errorMessage = error.message;
+        }
+        
+        // Lanzar el error con el mensaje traducido para que el frontend lo maneje
+        throw new Error(errorMessage);
     }
 }
 
@@ -108,7 +129,9 @@ async function loginWithGoogle() {
 
 // Registrar usuario
 async function registerUser(email, password, displayName = '') {
-    if (!auth || !firebaseAuth) return false;
+    if (!auth || !firebaseAuth) {
+        throw new Error('Firebase no está inicializado. Por favor, recarga la página.');
+    }
     
     try {
         const { createUserWithEmailAndPassword, updateProfile } = firebaseAuth;
@@ -122,8 +145,27 @@ async function registerUser(email, password, displayName = '') {
         return true;
     } catch (error) {
         console.error('Register error:', error);
-        alert('Error de registro: ' + error.message);
-        return false;
+        
+        // Traducir errores de Firebase a mensajes más amigables
+        let errorMessage = 'Error al registrar usuario. Por favor, intenta de nuevo.';
+        
+        if (error.code === 'auth/email-already-in-use') {
+            errorMessage = 'Este email ya está registrado. Por favor, inicia sesión o usa otro email.';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = 'El formato del email no es válido.';
+        } else if (error.code === 'auth/weak-password') {
+            errorMessage = 'La contraseña es muy débil. Debe tener al menos 6 caracteres.';
+        } else if (error.code === 'auth/operation-not-allowed') {
+            errorMessage = 'El registro con email/contraseña no está habilitado. Contacta al administrador.';
+        } else if (error.code === 'auth/network-request-failed') {
+            errorMessage = 'Error de conexión. Por favor, verifica tu conexión a internet.';
+        } else if (error.message) {
+            // Si hay un mensaje personalizado, usarlo
+            errorMessage = error.message;
+        }
+        
+        // Lanzar el error con el mensaje traducido para que el frontend lo maneje
+        throw new Error(errorMessage);
     }
 }
 

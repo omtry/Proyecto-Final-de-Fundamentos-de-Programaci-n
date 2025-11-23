@@ -30,7 +30,9 @@ class ReservasValidator {
     if (!reservaData.fecha) {
       this.errors.push({ field: 'fecha', message: 'Debes seleccionar una fecha' });
     } else {
-      const fecha = new Date(reservaData.fecha);
+      // Parsear fecha manualmente para evitar problemas de zona horaria
+      const [year, month, day] = reservaData.fecha.split('-').map(Number);
+      const fecha = new Date(year, month - 1, day); // month es 0-indexed
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
       

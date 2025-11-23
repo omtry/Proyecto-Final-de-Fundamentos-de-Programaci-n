@@ -295,7 +295,9 @@
                     showError('Credenciales incorrectas. Por favor, intenta de nuevo.');
                 }
             } catch (error) {
-                showError('Error al iniciar sesión: ' + error.message);
+                // Mostrar el mensaje de error traducido
+                const errorMessage = error.message || 'Error al iniciar sesión. Por favor, intenta de nuevo.';
+                showError(errorMessage);
             } finally {
                 loginBtn.disabled = false;
                 loginBtn.textContent = 'Iniciar Sesión';

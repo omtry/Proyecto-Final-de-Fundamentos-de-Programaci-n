@@ -446,7 +446,10 @@ function showConfirmModal(message, onConfirm, onCancel) {
 
 // Función para formatear fechas
 function formatDate(dateString) {
-    const date = new Date(dateString);
+    // Parsear la fecha manualmente para evitar problemas de zona horaria
+    // Formato esperado: YYYY-MM-DD
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month es 0-indexed en Date
     return date.toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'long',
@@ -737,7 +740,14 @@ function displayReservasActivas(reservas) {
                             Cancelar Reserva
                         </button>
                     </div>
-                ` : '<p style="margin-top: 0.5rem; color: var(--accent); font-weight: 600;">✅ Reserva finalizada</p>'}
+                ` : `
+                    <p style="margin-top: 0.5rem; color: var(--accent); font-weight: 600;">✅ Reserva finalizada</p>
+                    <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+                        <button onclick="cancelarReservaActiva(${reserva.id})" class="btn-cancel-reserva" type="button">
+                            🗑️ Eliminar Reserva
+                        </button>
+                    </div>
+                `}
             </div>
         `;
     }).join('');

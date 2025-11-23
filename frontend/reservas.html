@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -152,7 +153,7 @@
             margin-left: 0.5rem;
         }
 
-        .reserva-item-header > div {
+        .reserva-item-header>div {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
@@ -253,7 +254,9 @@
             margin-bottom: 0.5rem;
         }
 
-        .form-input, .form-select, .form-textarea {
+        .form-input,
+        .form-select,
+        .form-textarea {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -262,7 +265,9 @@
             transition: border-color 0.3s ease;
         }
 
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
             outline: none;
             border-color: var(--primary);
         }
@@ -544,6 +549,7 @@
                 opacity: 0;
                 transform: translate(-50%, -50%) scale(0.9);
             }
+
             to {
                 opacity: 1;
                 transform: translate(-50%, -50%) scale(1);
@@ -583,22 +589,23 @@
                 flex-direction: column;
                 gap: 1rem;
             }
-            
+
             .nav-links {
                 flex-wrap: wrap;
                 justify-content: center;
             }
-            
+
             .hero-title {
                 font-size: 2rem;
             }
-            
+
             .form-row {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -607,7 +614,7 @@
             <div class="nav-links">
                 <a href="/" class="nav-link">Principal</a>
                 <a href="/rooms" class="nav-link">Salas</a>
-                <a href="/profile" class="nav-link">Perfil</a>
+                <a href="/profile" class="nav-link" id="profileLink" style="display: none;">Perfil</a>
                 <a href="/about" class="nav-link">About us</a>
             </div>
         </div>
@@ -632,84 +639,83 @@
             <div class="form-section">
                 <!-- Reservation Form -->
                 <div class="reservation-form">
-            <form id="reservationForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="salaId" class="form-label">Sala *</label>
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <select id="salaId" name="salaId" class="form-select" required style="flex: 1;">
-                                <option value="">Selecciona una sala</option>
-                            </select>
-                            <button type="button" onclick="mostrarSalasDisponibles()" class="btn" style="padding: 0.75rem 1rem; white-space: nowrap;">
-                                Ver Salas Disponibles
+                    <form id="reservationForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="salaId" class="form-label">Sala *</label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <select id="salaId" name="salaId" class="form-select" required style="flex: 1;">
+                                        <option value="">Selecciona una sala</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="fecha" class="form-label">Fecha *</label>
+                                <input type="date" id="fecha" name="fecha" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="horario" class="form-label">Horario *</label>
+                                <select id="horario" name="horario" class="form-select" required>
+                                    <option value="">Selecciona un horario</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="duracion" class="form-label">Duración (horas) *</label>
+                                <select id="duracion" name="duracion" class="form-select" required>
+                                    <option value="">Selecciona duración</option>
+                                    <option value="0.5">0.5 horas</option>
+                                    <option value="1">1 hora</option>
+                                    <option value="1.5">1.5 horas</option>
+                                    <option value="2">2 horas (máximo)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Details Section -->
+                        <div class="form-group" id="salaDetails">
+                            <h3 style="margin-bottom: 1rem; color: var(--primary); font-size: 1.2rem;">Detalles de la
+                                Sala</h3>
+                            <div
+                                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding: 1.5rem; background-color: var(--primary-light); border-radius: var(--radius);">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+                                    <span style="font-size: 2rem;">🖥️</span>
+                                    <span style="color: var(--text); font-weight: 500;">1 TV Pantalla Grande</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+                                    <span style="font-size: 2rem;">🪑</span>
+                                    <span style="color: var(--text); font-weight: 500;">4 Sillas Comodas</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+                                    <span style="font-size: 2rem;">🛋️</span>
+                                    <span style="color: var(--text); font-weight: 500;">1 Mesa de Reunión</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+                                    <span style="font-size: 2rem;">📡</span>
+                                    <span style="color: var(--text); font-weight: 500;">WiFi Rápido</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+                                    <span style="font-size: 2rem;">🎤</span>
+                                    <span style="color: var(--text); font-weight: 500;">Sistema de Audio</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+                                    <span style="font-size: 2rem;">❄️</span>
+                                    <span style="color: var(--text); font-weight: 500;">Aire Acondicionado</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="button" onclick="window.location.href='/rooms'" class="btn btn-secondary">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn" id="submitBtn">
+                                Crear Reserva
                             </button>
                         </div>
-                        </div>
-                    <div class="form-group">
-                        <label for="fecha" class="form-label">Fecha *</label>
-                        <input type="date" id="fecha" name="fecha" class="form-input" required>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="horario" class="form-label">Horario *</label>
-                        <select id="horario" name="horario" class="form-select" required>
-                            <option value="">Selecciona un horario</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="duracion" class="form-label">Duración (horas) *</label>
-                        <select id="duracion" name="duracion" class="form-select" required>
-                            <option value="">Selecciona duración</option>
-                            <option value="0.5">0.5 horas</option>
-                            <option value="1">1 hora</option>
-                            <option value="1.5">1.5 horas</option>
-                            <option value="2">2 horas (máximo)</option>
-                        </select>
-                    </div>
-                    </div>
-
-                <!-- Details Section -->
-                <div class="form-group" id="salaDetails">
-                    <h3 style="margin-bottom: 1rem; color: var(--primary); font-size: 1.2rem;">Detalles de la Sala</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding: 1.5rem; background-color: var(--primary-light); border-radius: var(--radius);">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
-                            <span style="font-size: 2rem;">🖥️</span>
-                            <span style="color: var(--text); font-weight: 500;">1 TV Pantalla Grande</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
-                            <span style="font-size: 2rem;">🪑</span>
-                            <span style="color: var(--text); font-weight: 500;">4 Sillas Comodas</span>
-                    </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
-                            <span style="font-size: 2rem;">🛋️</span>
-                            <span style="color: var(--text); font-weight: 500;">1 Mesa de Reunión</span>
-                    </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
-                            <span style="font-size: 2rem;">📡</span>
-                            <span style="color: var(--text); font-weight: 500;">WiFi Rápido</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
-                            <span style="font-size: 2rem;">🎤</span>
-                            <span style="color: var(--text); font-weight: 500;">Sistema de Audio</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
-                            <span style="font-size: 2rem;">❄️</span>
-                            <span style="color: var(--text); font-weight: 500;">Aire Acondicionado</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button type="button" onclick="window.location.href='/rooms'" class="btn btn-secondary">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn" id="submitBtn">
-                        Crear Reserva
-                    </button>
-                </div>
-            </form>
+                    </form>
                 </div>
 
                 <!-- Messages Container -->
@@ -740,7 +746,7 @@
         let horarios = [];
 
         // Inicializar página
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Verificar autenticación con un delay para permitir que auth.js se inicialice
             setTimeout(() => {
                 checkAuthAndLoad();
@@ -749,6 +755,11 @@
 
         // Función para verificar auth y cargar datos
         function checkAuthAndLoad() {
+            // Actualizar UI de autenticación
+            if (window.auth) {
+                window.auth.updateUI();
+            }
+
             // Verificar autenticación
             if (!window.auth || !window.auth.isAuthenticated()) {
                 alert('Debes iniciar sesión para hacer una reserva');
@@ -769,13 +780,13 @@
                 const year = today.getFullYear();
                 const month = today.getMonth();
                 const todayStr = today.toISOString().split('T')[0];
-                
+
                 // Calcular primera y última fecha del mes actual
                 // Mínimo: hoy (no se pueden seleccionar fechas pasadas)
                 // Máximo: último día del mes actual, pero solo del año 2025
                 const lastDayOfMonth = new Date(year, month + 1, 0);
                 let monthEnd = lastDayOfMonth.toISOString().split('T')[0];
-                
+
                 // Asegurar que solo se permitan fechas del año 2025
                 const year2025 = 2025;
                 if (year !== year2025) {
@@ -785,7 +796,7 @@
                     // Si estamos en 2025, usar el último día del mes actual
                     monthEnd = lastDayOfMonth.toISOString().split('T')[0];
                 }
-                
+
                 // Asegurar que el mínimo sea hoy o el primer día de 2025 si estamos antes
                 let minDate = todayStr;
                 if (year < year2025) {
@@ -795,13 +806,13 @@
                     minDate = `${year2025}-12-31`;
                     monthEnd = `${year2025}-12-31`;
                 }
-                
+
                 const fechaInput = document.getElementById('fecha');
                 if (fechaInput) {
                     // Establecer límites ANTES de establecer el valor
                     fechaInput.setAttribute('min', minDate); // No permitir fechas pasadas a hoy
                     fechaInput.setAttribute('max', monthEnd); // Solo hasta el fin del mes actual, año 2025
-                    
+
                     // Establecer fecha automáticamente a hoy (si estamos en 2025)
                     if (year === year2025) {
                         fechaInput.value = todayStr;
@@ -810,20 +821,20 @@
                     } else {
                         fechaInput.value = `${year2025}-12-31`;
                     }
-                    
+
                     // Habilitar el input de fecha para que se pueda cambiar
                     fechaInput.disabled = false;
                     fechaInput.readOnly = false;
                     fechaInput.style.backgroundColor = '';
                     fechaInput.style.cursor = '';
-                    
+
                     // Validar que la fecha seleccionada esté dentro del rango permitido
-                    fechaInput.addEventListener('change', function(e) {
+                    fechaInput.addEventListener('change', function (e) {
                         const selectedDate = new Date(this.value);
                         const selectedDateStr = this.value;
                         const minDateObj = new Date(minDate);
                         const maxDateObj = new Date(monthEnd);
-                        
+
                         // Verificar que esté dentro del rango permitido
                         if (selectedDate < minDateObj || selectedDate > maxDateObj) {
                             showMessage('La fecha debe estar entre hoy y el último día del mes actual (solo año 2025)', 'error');
@@ -835,7 +846,7 @@
                             }
                             return false;
                         }
-                        
+
                         // Verificar que sea del año 2025
                         if (selectedDate.getFullYear() !== year2025) {
                             showMessage('Solo se permiten reservas para el año 2025', 'error');
@@ -850,7 +861,7 @@
                 if (salasResponse.success) {
                     salas = salasResponse.data;
                     populateSalasSelect();
-                    
+
                     // Seleccionar automáticamente la sala si viene en la URL
                     const urlParams = new URLSearchParams(window.location.search);
                     const salaIdParam = urlParams.get('sala');
@@ -862,15 +873,15 @@
                             setTimeout(() => {
                                 salaSelect.value = salaId;
                                 console.log('Sala seleccionada automáticamente:', salaId, 'Valor actual:', salaSelect.value);
-                                
+
                                 // Deshabilitar solo el select de sala para que no se pueda cambiar
                                 salaSelect.disabled = true;
                                 salaSelect.style.backgroundColor = '#f3f4f6';
                                 salaSelect.style.cursor = 'not-allowed';
-                                
+
                                 // Disparar evento change para cargar detalles de la sala si es necesario
                                 salaSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                                
+
                                 // Actualizar disponibilidad para marcar la sala como ocupada
                                 actualizarDisponibilidadSala(salaId, true);
                             }, 100);
@@ -883,16 +894,6 @@
                 if (horariosResponse.success) {
                     horarios = horariosResponse.data;
                     populateHorariosSelect();
-                    
-                    // Seleccionar automáticamente el primer horario disponible si hay horarios
-                    const horarioSelect = document.getElementById('horario');
-                    if (horarioSelect && horarios && horarios.length > 0) {
-                        setTimeout(() => {
-                            // Seleccionar el primer horario disponible
-                            horarioSelect.value = horarios[0];
-                            console.log('Horario seleccionado automáticamente:', horarios[0]);
-                        }, 200);
-                    }
                 }
 
                 // Cargar TODAS las reservas para el sidebar (no solo las del usuario)
@@ -912,7 +913,7 @@
                         if (reservasActivas && reservasActivas.length > 0) {
                             // Mostrar sección de reservas activas
                             displayReservasActivasEnReservas(reservasActivas);
-                            
+
                             const reservaActiva = reservasActivas[0];
                             showMessage(
                                 `⚠️ Tienes una reserva activa en ${reservaActiva.salaNombre} (${formatDate(reservaActiva.fecha)} de ${formatTime(reservaActiva.horario)} a ${formatTime(reservaActiva.horaFin)}). No podrás crear una nueva reserva hasta que termine esta.`,
@@ -922,7 +923,7 @@
                             const horarioSelect = document.getElementById('horario');
                             const duracionSelect = document.getElementById('duracion');
                             const submitBtn = document.getElementById('submitBtn');
-                            
+
                             if (horarioSelect && !horarioSelect.disabled) horarioSelect.disabled = true;
                             if (duracionSelect && !duracionSelect.disabled) duracionSelect.disabled = true;
                             if (submitBtn && !submitBtn.disabled) submitBtn.disabled = true;
@@ -947,9 +948,9 @@
         function populateSalasSelect() {
             const salaSelect = document.getElementById('salaId');
             if (!salaSelect) return;
-            
+
             salaSelect.innerHTML = '<option value="">Selecciona una sala</option>';
-            
+
             salas.forEach(sala => {
                 const option = document.createElement('option');
                 option.value = sala.id;
@@ -957,7 +958,7 @@
                 option.textContent = `${sala.nombre} (${sala.capacidad} personas)`;
                 salaSelect.appendChild(option);
             });
-            
+
             // Verificar si hay una sala en la URL después de poblar las opciones
             const urlParams = new URLSearchParams(window.location.search);
             const salaIdParam = urlParams.get('sala');
@@ -982,7 +983,7 @@
         async function mostrarSalasDisponibles() {
             const modal = document.getElementById('salasModal');
             const salasGrid = document.getElementById('salasGrid');
-            
+
             // Cargar disponibilidad
             try {
                 const disponibilidad = await window.loadDisponibilidad();
@@ -999,12 +1000,12 @@
                     let ocupada = disp ? disp.ocupada : false;
                     const salaSelect = document.getElementById('salaId');
                     const isSelected = salaSelect && salaSelect.value == sala.id;
-                    
+
                     // Si la sala está seleccionada, marcarla como ocupada
                     if (isSelected) {
                         ocupada = true;
                     }
-                    
+
                     return `
                         <div class="sala-modal-card ${isSelected ? 'selected' : ''}" onclick="seleccionarSalaModal(${sala.id})">
                             <div class="sala-modal-header">
@@ -1059,7 +1060,7 @@
         }
 
         // Cerrar modal al hacer clic fuera
-        document.getElementById('salasModal')?.addEventListener('click', function(e) {
+        document.getElementById('salasModal')?.addEventListener('click', function (e) {
             if (e.target === this) {
                 cerrarModalSalas();
             }
@@ -1099,7 +1100,7 @@
                 const fechaB = new Date(b.fecha + 'T' + (b.horaFin || calcularHoraFinReserva(b.horario, b.duracion)));
                 const activaA = fechaA > ahora;
                 const activaB = fechaB > ahora;
-                
+
                 if (activaA && !activaB) return -1;
                 if (!activaA && activaB) return 1;
                 return fechaB - fechaA; // Más recientes primero
@@ -1164,24 +1165,34 @@
                 const result = await window.api.eliminarReserva(reservaId);
                 if (result && result.success) {
                     showMessage('✅ Reserva eliminada exitosamente', 'success');
-                    
+
                     // Recargar todas las reservas
                     const user = window.auth.getCurrentUser();
                     if (user) {
                         const todasLasReservas = await window.loadTodasLasReservas();
                         displayReservasSidebar(todasLasReservas || [], user.uid);
-                        
-                        // Verificar si aún hay reservas activas y habilitar/deshabilitar formulario
+
+                        // Recargar también las reservas activas para actualizar la sección "Mis Reservas Activas"
                         const reservasActivas = await window.loadReservasActivas(user.uid);
+                        displayReservasActivasEnReservas(reservasActivas || []);
+
+                        // Verificar si aún hay reservas activas y habilitar/deshabilitar formulario
                         if (reservasActivas && reservasActivas.length === 0) {
                             // No hay reservas activas, habilitar formulario
                             const horarioSelect = document.getElementById('horario');
                             const duracionSelect = document.getElementById('duracion');
                             const submitBtn = document.getElementById('submitBtn');
-                            
+
                             if (horarioSelect) horarioSelect.disabled = false;
                             if (duracionSelect) duracionSelect.disabled = false;
                             if (submitBtn) submitBtn.disabled = false;
+
+                            // Ocultar mensaje de advertencia si existe
+                            const messagesContainer = document.getElementById('messages');
+                            if (messagesContainer) {
+                                const warningMessages = messagesContainer.querySelectorAll('.message-warning');
+                                warningMessages.forEach(msg => msg.remove());
+                            }
                         }
                     }
                 } else {
@@ -1193,67 +1204,25 @@
             }
         }
 
-        // Hacer función disponible globalmente ANTES de usarla
+        // Hacer función disponible globalmente
         window.eliminarReserva = eliminarReserva;
-        
-        // También definirla directamente en window para asegurar que esté disponible
-        window.eliminarReserva = async function(reservaId) {
-            console.log('eliminarReserva llamada con ID:', reservaId);
-            if (!confirm('¿Estás seguro de que quieres eliminar esta reserva?')) {
-                return;
-            }
-
-            try {
-                console.log('Eliminando reserva:', reservaId);
-                const result = await window.api.eliminarReserva(reservaId);
-                console.log('Resultado de eliminar:', result);
-                if (result && result.success) {
-                    showMessage('✅ Reserva eliminada exitosamente', 'success');
-                    
-                    // Recargar todas las reservas
-                    const user = window.auth.getCurrentUser();
-                    if (user) {
-                        const todasLasReservas = await window.loadTodasLasReservas();
-                        displayReservasSidebar(todasLasReservas || [], user.uid);
-                        
-                        // Verificar si aún hay reservas activas y habilitar/deshabilitar formulario
-                        const reservasActivas = await window.loadReservasActivas(user.uid);
-                        if (reservasActivas && reservasActivas.length === 0) {
-                            // No hay reservas activas, habilitar formulario
-                            const horarioSelect = document.getElementById('horario');
-                            const duracionSelect = document.getElementById('duracion');
-                            const submitBtn = document.getElementById('submitBtn');
-                            
-                            if (horarioSelect) horarioSelect.disabled = false;
-                            if (duracionSelect) duracionSelect.disabled = false;
-                            if (submitBtn) submitBtn.disabled = false;
-                        }
-                    }
-                } else {
-                    showMessage('Error al eliminar la reserva', 'error');
-                }
-            } catch (error) {
-                console.error('Error al eliminar reserva:', error);
-                showMessage('Error al eliminar la reserva: ' + error.message, 'error');
-            }
-        };
 
         // Mostrar reservas activas en la página de reservas
         function displayReservasActivasEnReservas(reservas) {
             const myReservations = document.getElementById('myReservations');
             const reservasActivasContainer = document.getElementById('reservasActivasContainer');
-            
+
             if (!myReservations || !reservasActivasContainer) {
                 return;
             }
-            
+
             if (reservas.length === 0) {
                 myReservations.style.display = 'none';
                 return;
             }
-            
+
             myReservations.style.display = 'block';
-            
+
             reservasActivasContainer.innerHTML = reservas.map(reserva => {
                 // Calcular tiempo restante
                 const ahora = new Date();
@@ -1262,7 +1231,7 @@
                 const horasRestantes = Math.floor(tiempoRestante / (1000 * 60 * 60));
                 const minutosRestantes = Math.floor((tiempoRestante % (1000 * 60 * 60)) / (1000 * 60));
                 const esActiva = tiempoRestante > 0;
-                
+
                 return `
                     <div class="reserva-activa-card">
                         <h4>${reserva.salaNombre}</h4>
@@ -1279,7 +1248,14 @@
                                     Cancelar Reserva
                                 </button>
                             </div>
-                        ` : '<p style="margin-top: 0.5rem; color: var(--accent); font-weight: 600;">✅ Reserva finalizada</p>'}
+                        ` : `
+                            <p style="margin-top: 0.5rem; color: var(--accent); font-weight: 600;">✅ Reserva finalizada</p>
+                            <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
+                                <button onclick="window.eliminarReserva(${reserva.id})" class="btn-eliminar-reserva" type="button" style="background-color: #EF4444; color: white; border: none; border-radius: 0.5rem; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+                                    🗑️ Eliminar Reserva
+                                </button>
+                            </div>
+                        `}
                     </div>
                 `;
             }).join('');
@@ -1292,31 +1268,52 @@
         function populateHorariosSelect() {
             const horarioSelect = document.getElementById('horario');
             if (!horarioSelect) return;
-            
+
             horarioSelect.innerHTML = '<option value="">Selecciona un horario</option>';
-            
+
             if (!horarios || horarios.length === 0) return;
-            
+
             horarios.forEach(horario => {
                 const option = document.createElement('option');
                 option.value = horario;
                 option.textContent = formatTime(horario);
                 horarioSelect.appendChild(option);
             });
-            
-            // Seleccionar automáticamente el primer horario disponible
+
+            // Seleccionar automáticamente el horario actual
             if (horarios.length > 0) {
                 setTimeout(() => {
-                    horarioSelect.value = horarios[0];
-                    console.log('Horario seleccionado automáticamente:', horarios[0]);
+                    const now = new Date();
+                    const currentHour = now.getHours();
+
+                    // Formatear la hora actual para buscarla en la lista (ej: "17:00")
+                    // Aseguramos que tenga 2 dígitos y minutos "00" ya que los horarios son en punto
+                    const currentHourStr = `${currentHour.toString().padStart(2, '0')}:00`;
+
+                    console.log('Hora actual del sistema:', currentHourStr);
+
+                    // Buscar coincidencia exacta
+                    const exactMatch = horarios.find(h => h === currentHourStr);
+
+                    if (exactMatch) {
+                        horarioSelect.value = exactMatch;
+                        console.log('Horario seleccionado automáticamente (coincidencia exacta):', exactMatch);
+                    } else {
+                        console.log('No se encontró horario exacto para la hora actual:', currentHourStr);
+                    }
+
+                    // Disparar evento change para actualizar la duración permitida si se seleccionó algo
+                    if (horarioSelect.value) {
+                        horarioSelect.dispatchEvent(new Event('change'));
+                    }
                 }, 100);
             }
         }
 
         // Manejar envío del formulario
-        document.getElementById('reservationForm').addEventListener('submit', async function(e) {
+        document.getElementById('reservationForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Verificando...';
@@ -1324,7 +1321,7 @@
             try {
                 // Obtener usuario primero
                 const currentUser = window.auth.getCurrentUser();
-                
+
                 if (!currentUser || !currentUser.uid) {
                     showMessage('Error: No se pudo obtener la información del usuario. Por favor, inicia sesión nuevamente.', 'error');
                     submitBtn.disabled = false;
@@ -1338,13 +1335,13 @@
                     const reservaActiva = reservasActivas[0];
                     const mensajeError = `❌ No puedes hacer otra reserva. Ya tienes una reserva activa en ${reservaActiva.salaNombre} (${formatDate(reservaActiva.fecha)} de ${formatTime(reservaActiva.horario)} a ${formatTime(reservaActiva.horaFin)}). Solo se puede hacer una reserva a la vez. Debes esperar a que termine esta reserva antes de hacer una nueva.`;
                     showMessage(mensajeError, 'error');
-                    
+
                     // Recargar el sidebar para mostrar la reserva activa
                     const todasLasReservas = await window.loadReservasUsuario(currentUser.uid);
                     if (todasLasReservas) {
                         displayReservasSidebar(todasLasReservas);
                     }
-                    
+
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Crear Reserva';
                     return;
@@ -1357,19 +1354,19 @@
                 const fechaInput = document.getElementById('fecha');
                 const horarioSelect = document.getElementById('horario');
                 const duracionSelect = document.getElementById('duracion');
-                
+
                 const salaId = salaSelect ? salaSelect.value : '';
                 const fecha = fechaInput ? fechaInput.value : '';
                 const horario = horarioSelect ? horarioSelect.value : '';
                 const duracion = duracionSelect ? duracionSelect.value : '';
-                
+
                 // Validar que todos los campos requeridos estén presentes con mensajes específicos
                 const camposFaltantes = [];
                 if (!salaId || salaId === '') camposFaltantes.push('Sala');
                 if (!fecha || fecha === '') camposFaltantes.push('Fecha');
                 if (!horario || horario === '') camposFaltantes.push('Horario');
                 if (!duracion || duracion === '') camposFaltantes.push('Duración');
-                
+
                 if (camposFaltantes.length > 0) {
                     showMessage(`Por favor completa los siguientes campos: ${camposFaltantes.join(', ')}`, 'error');
                     console.error('Campos faltantes:', camposFaltantes);
@@ -1378,7 +1375,7 @@
                     submitBtn.textContent = 'Crear Reserva';
                     return;
                 }
-                
+
                 const reservaData = {
                     salaId: parseInt(salaId),
                     fecha: fecha,
@@ -1405,7 +1402,7 @@
                     if (todasLasReservas) {
                         displayReservasSidebar(todasLasReservas);
                     }
-                    
+
                     showSuccessPopup();
                     setTimeout(() => {
                         window.location.href = '/rooms';
@@ -1460,11 +1457,106 @@
             }, 2000);
         }
 
+        // Validar y ajustar duración al cambiar horario
+        document.getElementById('horario').addEventListener('change', function () {
+            const horario = this.value;
+            const duracionSelect = document.getElementById('duracion');
+
+            if (!horario) return;
+
+            const [hora, minuto] = horario.split(':').map(Number);
+            // Hora límite es 18:00 (6 PM)
+            const horaLimite = 18;
+            const horasRestantes = horaLimite - hora;
+
+            // Habilitar/deshabilitar opciones según el tiempo restante
+            Array.from(duracionSelect.options).forEach(option => {
+                if (option.value === "") return;
+
+                const duracion = parseFloat(option.value);
+                if (duracion > horasRestantes) {
+                    option.disabled = true;
+                    option.text = `${duracion} horas (Excede horario límite)`;
+                } else {
+                    option.disabled = false;
+                    // Restaurar texto original si es necesario (simplificado)
+                    if (option.text.includes('(Excede')) {
+                        option.text = option.value + (option.value === "1" ? " hora" : " horas");
+                        if (option.value === "2") option.text += " (máximo)";
+                    }
+                }
+            });
+
+            // Seleccionar automáticamente la duración máxima posible si la actual es inválida
+            // O si no hay ninguna seleccionada, seleccionar una válida por defecto (ej. 1 hora o lo que quepa)
+            const currentDuracion = parseFloat(duracionSelect.value);
+
+            if (!duracionSelect.value || currentDuracion > horasRestantes) {
+                // Intentar seleccionar 1 hora si es posible, sino la máxima posible (que sería 0.5 o lo que quede)
+                // Pero el usuario pidió "aproxime a la hora que si se puede"
+
+                let nuevaDuracion = 1; // Default preferido
+                if (nuevaDuracion > horasRestantes) {
+                    nuevaDuracion = horasRestantes;
+                }
+
+                // Buscar la opción que coincida con nuevaDuracion
+                // Si nuevaDuracion es 0 (ej. seleccionó 18:00), entonces no se puede reservar
+                if (horasRestantes <= 0) {
+                    // Esto no debería pasar si los horarios están filtrados hasta las 17:00
+                } else {
+                    // Encontrar la opción más cercana válida
+                    const opcionesValidas = Array.from(duracionSelect.options).filter(opt => !opt.disabled && opt.value !== "");
+                    if (opcionesValidas.length > 0) {
+                        // Si 1 hora es válida, usarla. Si no, usar la más grande posible que sea <= horasRestantes?
+                        // El usuario dijo: "si elige una hora que no se puede la aproxime a la hora que si se puede"
+                        // Ej: Elijo 5PM (queda 1h). Si tenía 2h seleccionada, cambiar a 1h.
+
+                        // Verificar si la opción de 1 hora está disponible y habilitada
+                        const opcion1h = duracionSelect.querySelector('option[value="1"]');
+                        const opcion2h = duracionSelect.querySelector('option[value="2"]');
+
+                        if (currentDuracion > horasRestantes) {
+                            // Si la seleccionada excede, seleccionar la máxima posible
+                            // Encontrar la opción con el valor más alto que sea <= horasRestantes
+                            let maxValid = 0;
+                            let maxValidValue = "";
+
+                            opcionesValidas.forEach(opt => {
+                                const val = parseFloat(opt.value);
+                                if (val <= horasRestantes && val > maxValid) {
+                                    maxValid = val;
+                                    maxValidValue = opt.value;
+                                }
+                            });
+
+                            if (maxValidValue) {
+                                duracionSelect.value = maxValidValue;
+                            }
+                        } else if (!duracionSelect.value) {
+                            // Si no hay nada seleccionado, seleccionar 1 hora por defecto si es posible
+                            // Si 1 hora no es posible (ej. queda 0.5h), seleccionar lo que se pueda
+                            const opcion1h = Array.from(duracionSelect.options).find(opt => opt.value === "1" && !opt.disabled);
+
+                            if (opcion1h) {
+                                duracionSelect.value = "1";
+                            } else {
+                                // Si no se puede 1 hora, seleccionar la primera opción válida disponible (probablemente 0.5)
+                                if (opcionesValidas.length > 0) {
+                                    duracionSelect.value = opcionesValidas[0].value;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         // Validar formulario en tiempo real
-        document.getElementById('duracion').addEventListener('change', async function() {
+        document.getElementById('duracion').addEventListener('change', async function () {
             const horario = document.getElementById('horario').value;
             const duracion = this.value;
-            
+
             if (horario && duracion) {
                 try {
                     const validation = await window.api.validarHorario(horario, duracion);
@@ -1492,4 +1584,5 @@
         </div>
     </div>
 </body>
+
 </html>

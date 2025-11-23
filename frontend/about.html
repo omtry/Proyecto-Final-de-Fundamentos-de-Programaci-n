@@ -179,8 +179,9 @@
         <div class="nav-links">
             <a href="/" class="nav-link">Principal</a>
             <a href="/rooms" class="nav-link">Salas</a>
-            <a href="/profile" class="nav-link">Perfil</a>
+            <a href="/profile" class="nav-link" id="profileLink" style="display: none;">Perfil</a>
             <a href="/about" class="nav-link active">About us</a>
+            <div id="userInfo"></div>
         </div>
     </div>
 
@@ -243,6 +244,9 @@
         </div>
     </div>
 
+    <!-- Include Auth Script -->
+    <script src="/js/auth.js"></script>
+    
     <script>
         // Simple navigation highlighting
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -250,6 +254,15 @@
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
             });
+        });
+
+        // Check authentication status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (window.auth) {
+                    window.auth.updateUI();
+                }
+            }, 1000);
         });
     </script>
 </body>
