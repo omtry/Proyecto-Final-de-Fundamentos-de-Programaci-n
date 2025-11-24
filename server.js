@@ -322,13 +322,23 @@ app.post('/api/reservas', (req, res) => {
       });
     }
 
-    // Verificar que el usuario no tenga reservas activas
+    // Verificar límite de reservas activas (máximo 2)
     const reservasActivas = getReservasActivasUsuario(userId);
-    if (reservasActivas.length > 0) {
+    if (reservasActivas.length >= 2) {
       return res.status(400).json({
         success: false,
-        message: 'Ya tienes una reserva activa. Solo puedes tener una reserva a la vez.',
-        reservaActiva: reservasActivas[0]
+        message: 'Ya tienes 2 reservas activas. Solo puedes tener un máximo de 2 reservas a la vez.',
+        reservasActivas: reservasActivas
+      });
+    }
+
+    // Verificar que no haya una reserva en la misma fecha
+    const reservaMismaFecha = reservasActivas.find(r => r.fecha === fecha);
+    if (reservaMismaFecha) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ya tienes una reserva para esta fecha. Solo puedes tener una reserva por día.',
+        reservaExistente: reservaMismaFecha
       });
     }
 

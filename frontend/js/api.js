@@ -624,13 +624,13 @@ async function initSalasPage() {
 
         // Cargar reservas activas del usuario si está autenticado
         let reservasActivas = [];
-        let tieneReservaActiva = false;
+        let tieneDosReservas = false;
 
         if (window.auth && window.auth.isAuthenticated()) {
             const user = window.auth.getCurrentUser();
             if (user) {
                 reservasActivas = await loadReservasActivas(user.uid);
-                tieneReservaActiva = reservasActivas.length > 0;
+                tieneDosReservas = reservasActivas.length >= 2;
                 displayReservasActivas(reservasActivas);
             }
         }
@@ -640,7 +640,7 @@ async function initSalasPage() {
                 const disp = disponibilidadMap[sala.id];
                 const ocupada = disp ? disp.ocupada : false;
                 const reservaActual = disp ? disp.reservaActual : null;
-                const puedeReservar = !tieneReservaActiva;
+                const puedeReservar = !tieneDosReservas;
 
                 return `
                 <div class="room-card">
@@ -661,10 +661,10 @@ async function initSalasPage() {
                                 <button 
                                     onclick="reservarSala(${sala.id})" 
                                     class="btn"
-                                    ${!puedeReservar ? 'disabled title="Ya tienes una reserva activa"' : ''}
+                                    ${!puedeReservar ? 'disabled title="Ya tienes 2 reservas activas"' : ''}
                                     ${ocupada ? 'disabled title="La sala está ocupada"' : ''}
                                 >
-                                    ${!puedeReservar ? 'Reserva Activa' : ocupada ? 'Ocupada' : 'Reservar'}
+                                    ${!puedeReservar ? '2 Reservas' : ocupada ? 'Ocupada' : 'Reservar'}
                                 </button>
                             </div>
                         </div>
@@ -673,11 +673,18 @@ async function initSalasPage() {
             `;
             }).join('');
 
-            // Mostrar advertencia si tiene reserva activa
-            if (tieneReservaActiva) {
+            // Mostrar advertencia si tiene 2 reservas activas
+            if (tieneDosReservas) {
                 const warning = document.createElement('div');
                 warning.className = 'warning-message';
-                warning.innerHTML = '<strong>⚠️ Tienes una reserva activa.</strong> Debes esperar a que termine antes de hacer una nueva reserva.';
+                warning.innerHTML = '<strong>⚠️ Tienes 2 reservas activas.</strong> Has alcanzado el límite máximo. Debes esperar a que termine una antes de hacer una nueva reserva.';
+                salasContainer.insertBefore(warning, salasContainer.firstChild);
+            } else if (reservasActivas.length === 1) {
+                const warning = document.createElement('div');
+                warning.className = 'warning-message';
+                warning.style.backgroundColor = '#E6F0FF';
+                warning.style.color = '#0066FF';
+                warning.innerHTML = `<strong>ℹ️ Tienes 1 reserva activa.</strong> Puedes hacer 1 reserva más (en una fecha diferente).`;
                 salasContainer.insertBefore(warning, salasContainer.firstChild);
             }
         } else {
@@ -720,6 +727,10 @@ function displayReservasActivas(reservas) {
     console.log('Displaying active reservations section');
     myReservations.style.display = 'block';
 
+    // Get current user's display name
+    const user = window.auth ? window.auth.getCurrentUser() : null;
+    const userName = user ? (user.displayName || user.email.split('@')[0]) : 'Usuario';
+
     reservasActivasContainer.innerHTML = reservas.map(reserva => {
         // Calcular tiempo restante
         const ahora = new Date();
@@ -740,7 +751,7 @@ function displayReservasActivas(reservas) {
                 </div>
                 
                 <div style="color: #4B5563; font-size: 0.95rem; line-height: 1.6;">
-                    <p style="margin-bottom: 0.25rem;"><strong>Usuario:</strong> Usuario</p>
+                    <p style="margin-bottom: 0.25rem;"><strong>Usuario:</strong> ${userName}</p>
                     <p style="margin-bottom: 0.25rem;"><strong>Fecha:</strong> ${formatDate(reserva.fecha)}</p>
                     <p style="margin-bottom: 0.25rem;"><strong>Horario:</strong> ${formatTime(reserva.horario)} - ${formatTime(reserva.horaFin)}</p>
                     <p style="margin-bottom: 0.25rem;"><strong>Duración:</strong> ${reserva.duracion} horas</p>

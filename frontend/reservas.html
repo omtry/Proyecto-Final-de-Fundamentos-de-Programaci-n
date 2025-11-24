@@ -914,19 +914,28 @@
                             // Mostrar sección de reservas activas
                             displayReservasActivasEnReservas(reservasActivas);
 
-                            const reservaActiva = reservasActivas[0];
-                            showMessage(
-                                `⚠️ Tienes una reserva activa en ${reservaActiva.salaNombre} (${formatDate(reservaActiva.fecha)} de ${formatTime(reservaActiva.horario)} a ${formatTime(reservaActiva.horaFin)}). No podrás crear una nueva reserva hasta que termine esta.`,
-                                'warning'
-                            );
-                            // Deshabilitar solo los campos que NO están ya deshabilitados
-                            const horarioSelect = document.getElementById('horario');
-                            const duracionSelect = document.getElementById('duracion');
-                            const submitBtn = document.getElementById('submitBtn');
+                            if (reservasActivas.length >= 2) {
+                                // Si tiene 2 reservas, bloquear el formulario
+                                showMessage(
+                                    `⚠️ Tienes 2 reservas activas. Has alcanzado el límite máximo. No podrás crear una nueva reserva hasta que termine una.`,
+                                    'warning'
+                                );
+                                // Deshabilitar solo los campos que NO están ya deshabilitados
+                                const horarioSelect = document.getElementById('horario');
+                                const duracionSelect = document.getElementById('duracion');
+                                const submitBtn = document.getElementById('submitBtn');
 
-                            if (horarioSelect && !horarioSelect.disabled) horarioSelect.disabled = true;
-                            if (duracionSelect && !duracionSelect.disabled) duracionSelect.disabled = true;
-                            if (submitBtn && !submitBtn.disabled) submitBtn.disabled = true;
+                                if (horarioSelect && !horarioSelect.disabled) horarioSelect.disabled = true;
+                                if (duracionSelect && !duracionSelect.disabled) duracionSelect.disabled = true;
+                                if (submitBtn && !submitBtn.disabled) submitBtn.disabled = true;
+                            } else if (reservasActivas.length === 1) {
+                                // Si tiene 1 reserva, mostrar mensaje informativo pero permitir otra reserva
+                                const reservaActiva = reservasActivas[0];
+                                showMessage(
+                                    `ℹ️ Tienes 1 reserva activa en ${reservaActiva.salaNombre} (${formatDate(reservaActiva.fecha)}). Puedes hacer 1 reserva más en una fecha diferente.`,
+                                    'info'
+                                );
+                            }
                         }
                     } catch (error) {
                         console.error('Error al cargar reservas:', error);
@@ -1331,12 +1340,13 @@
 
                 // Verificar reservas activas del usuario ANTES de crear la nueva reserva
                 const reservasActivas = await window.loadReservasActivas(currentUser.uid);
-                if (reservasActivas && reservasActivas.length > 0) {
-                    const reservaActiva = reservasActivas[0];
-                    const mensajeError = `❌ No puedes hacer otra reserva. Ya tienes una reserva activa en ${reservaActiva.salaNombre} (${formatDate(reservaActiva.fecha)} de ${formatTime(reservaActiva.horario)} a ${formatTime(reservaActiva.horaFin)}). Solo se puede hacer una reserva a la vez. Debes esperar a que termine esta reserva antes de hacer una nueva.`;
+
+                // Verificar si ya tiene 2 reservas activas
+                if (reservasActivas && reservasActivas.length >= 2) {
+                    const mensajeError = `❌ No puedes hacer otra reserva. Ya tienes 2 reservas activas. Solo puedes tener un máximo de 2 reservas a la vez.`;
                     showMessage(mensajeError, 'error');
 
-                    // Recargar el sidebar para mostrar la reserva activa
+                    // Recargar el sidebar para mostrar las reservas activas
                     const todasLasReservas = await window.loadReservasUsuario(currentUser.uid);
                     if (todasLasReservas) {
                         displayReservasSidebar(todasLasReservas);
@@ -1347,11 +1357,27 @@
                     return;
                 }
 
+                // Verificar si ya tiene una reserva en la fecha seleccionada
+                const fechaInput = document.getElementById('fecha');
+                const fechaSeleccionada = fechaInput ? fechaInput.value : '';
+
+                if (reservasActivas && reservasActivas.length > 0) {
+                    const reservaMismaFecha = reservasActivas.find(r => r.fecha === fechaSeleccionada);
+                    if (reservaMismaFecha) {
+                        const mensajeError = `❌ Ya tienes una reserva para esta fecha (${formatDate(fechaSeleccionada)}) en ${reservaMismaFecha.salaNombre}. Solo puedes tener una reserva por día.`;
+                        showMessage(mensajeError, 'error');
+
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Crear Reserva';
+                        return;
+                    }
+                }
+
                 submitBtn.textContent = 'Creando...';
 
                 // Obtener datos del formulario directamente de los elementos (para manejar campos deshabilitados)
                 const salaSelect = document.getElementById('salaId');
-                const fechaInput = document.getElementById('fecha');
+                // fechaInput ya fue declarado anteriormente en la línea 1361
                 const horarioSelect = document.getElementById('horario');
                 const duracionSelect = document.getElementById('duracion');
 
