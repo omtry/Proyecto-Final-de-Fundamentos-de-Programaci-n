@@ -21,7 +21,7 @@ class ApiClient {
 
         try {
             const response = await fetch(url, config);
-            
+
             // Verificar el Content-Type antes de parsear
             const contentType = response.headers.get('content-type');
             if (!contentType || !contentType.includes('application/json')) {
@@ -29,7 +29,7 @@ class ApiClient {
                 console.error('Expected JSON but received:', contentType, text.substring(0, 100));
                 throw new Error(`El servidor devolvió un formato inesperado. Status: ${response.status}`);
             }
-            
+
             const data = await response.json();
 
             if (!response.ok) {
@@ -202,7 +202,7 @@ function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
-    
+
     // Estilos
     notification.style.cssText = `
         position: fixed;
@@ -544,10 +544,10 @@ async function cancelarReservaActiva(reservaId) {
                             resolve(false);
                             return;
                         }
-                        
+
                         // Recargar reservas activas
                         const reservasActivas = await loadReservasActivas(user.uid);
-                        
+
                         // Actualizar UI según la página actual
                         if (window.location.pathname === '/rooms' || window.location.pathname === '/room-details') {
                             // Página de salas
@@ -560,17 +560,17 @@ async function cancelarReservaActiva(reservaId) {
                             if (typeof displayReservasActivasEnReservas === 'function') {
                                 displayReservasActivasEnReservas(reservasActivas);
                             }
-                            
+
                             // Habilitar formulario si no hay reservas activas
                             if (reservasActivas.length === 0) {
                                 const horarioSelect = document.getElementById('horario');
                                 const duracionSelect = document.getElementById('duracion');
                                 const submitBtn = document.getElementById('submitBtn');
-                                
+
                                 if (horarioSelect) horarioSelect.disabled = false;
                                 if (duracionSelect) duracionSelect.disabled = false;
                                 if (submitBtn) submitBtn.disabled = false;
-                                
+
                                 // Ocultar mensaje de advertencia
                                 const warningMessages = document.querySelectorAll('.warning-message');
                                 warningMessages.forEach(msg => msg.remove());
@@ -601,19 +601,19 @@ async function cancelarReservaActiva(reservaId) {
 // Inicializar página de salas
 async function initSalasPage() {
     const salasContainer = document.getElementById('salas-container');
-    
+
     if (!salasContainer) {
         console.error('Container de salas no encontrado');
         return;
     }
-    
+
     try {
         // Cargar salas y disponibilidad
         const [salas, disponibilidad] = await Promise.all([
             loadSalas(),
             loadDisponibilidad()
         ]);
-        
+
         // Crear mapa de disponibilidad por sala ID
         const disponibilidadMap = {};
         if (disponibilidad && disponibilidad.length > 0) {
@@ -621,11 +621,11 @@ async function initSalasPage() {
                 disponibilidadMap[item.sala.id] = item;
             });
         }
-        
+
         // Cargar reservas activas del usuario si está autenticado
         let reservasActivas = [];
         let tieneReservaActiva = false;
-        
+
         if (window.auth && window.auth.isAuthenticated()) {
             const user = window.auth.getCurrentUser();
             if (user) {
@@ -634,14 +634,14 @@ async function initSalasPage() {
                 displayReservasActivas(reservasActivas);
             }
         }
-        
+
         if (salas && salas.length > 0) {
             salasContainer.innerHTML = salas.map(sala => {
                 const disp = disponibilidadMap[sala.id];
                 const ocupada = disp ? disp.ocupada : false;
                 const reservaActual = disp ? disp.reservaActual : null;
                 const puedeReservar = !tieneReservaActiva;
-                
+
                 return `
                 <div class="room-card">
                     <div class="room-content">
@@ -672,7 +672,7 @@ async function initSalasPage() {
                 </div>
             `;
             }).join('');
-            
+
             // Mostrar advertencia si tiene reserva activa
             if (tieneReservaActiva) {
                 const warning = document.createElement('div');
@@ -703,18 +703,23 @@ async function initSalasPage() {
 function displayReservasActivas(reservas) {
     const myReservations = document.getElementById('myReservations');
     const reservasActivasContainer = document.getElementById('reservasActivasContainer');
-    
+
+    console.log('displayReservasActivas called with:', reservas);
+
     if (!myReservations || !reservasActivasContainer) {
+        console.error('Containers not found:', { myReservations, reservasActivasContainer });
         return;
     }
-    
+
     if (reservas.length === 0) {
+        console.log('No active reservations to display');
         myReservations.style.display = 'none';
         return;
     }
-    
+
+    console.log('Displaying active reservations section');
     myReservations.style.display = 'block';
-    
+
     reservasActivasContainer.innerHTML = reservas.map(reserva => {
         // Calcular tiempo restante
         const ahora = new Date();
@@ -723,31 +728,43 @@ function displayReservasActivas(reservas) {
         const horasRestantes = Math.floor(tiempoRestante / (1000 * 60 * 60));
         const minutosRestantes = Math.floor((tiempoRestante % (1000 * 60 * 60)) / (1000 * 60));
         const esActiva = tiempoRestante > 0;
-        
+
         return `
-            <div class="reserva-activa-card">
-                <h4>${reserva.salaNombre}</h4>
-                <p><strong>Fecha:</strong> ${formatDate(reserva.fecha)}</p>
-                <p><strong>Horario:</strong> ${formatTime(reserva.horario)} - ${formatTime(reserva.horaFin)}</p>
-                <p><strong>Duración:</strong> ${reserva.duracion} horas</p>
-                <p><strong>Propósito:</strong> ${reserva.proposito}</p>
-                ${esActiva ? `
-                    <p style="margin-top: 0.5rem; color: var(--primary); font-weight: 600;">
-                        ⏱️ Tiempo restante: ${horasRestantes}h ${minutosRestantes}m
-                    </p>
-                    <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
-                        <button onclick="cancelarReservaActiva(${reserva.id})" class="btn-cancel-reserva" type="button">
-                            Cancelar Reserva
-                        </button>
+            <div class="reserva-activa-card" style="background-color: #E6F0FF; border-left: 4px solid #0066FF; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="color: #1E1E1E; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">${reserva.salaNombre}</h4>
+                        <span style="background-color: #0066FF; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">Mi reserva</span>
                     </div>
-                ` : `
-                    <p style="margin-top: 0.5rem; color: var(--accent); font-weight: 600;">✅ Reserva finalizada</p>
-                    <div style="margin-top: 1rem; display: flex; justify-content: flex-end;">
-                        <button onclick="cancelarReservaActiva(${reserva.id})" class="btn-cancel-reserva" type="button">
-                            🗑️ Eliminar Reserva
-                        </button>
-                    </div>
-                `}
+                    <span style="background-color: #D1FAE5; color: #059669; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">Activa</span>
+                </div>
+                
+                <div style="color: #4B5563; font-size: 0.95rem; line-height: 1.6;">
+                    <p style="margin-bottom: 0.25rem;"><strong>Usuario:</strong> Usuario</p>
+                    <p style="margin-bottom: 0.25rem;"><strong>Fecha:</strong> ${formatDate(reserva.fecha)}</p>
+                    <p style="margin-bottom: 0.25rem;"><strong>Horario:</strong> ${formatTime(reserva.horario)} - ${formatTime(reserva.horaFin)}</p>
+                    <p style="margin-bottom: 0.25rem;"><strong>Duración:</strong> ${reserva.duracion} horas</p>
+                </div>
+
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.05);">
+                    ${esActiva ? `
+                        <p style="color: #0066FF; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                            ⏱️ Tiempo restante: ${horasRestantes}h ${minutosRestantes}m
+                        </p>
+                        <div style="margin-top: 1rem;">
+                            <button onclick="cancelarReservaActiva(${reserva.id})" class="btn-cancel-reserva" type="button" style="width: 100%; background-color: #EF4444; color: white; padding: 0.75rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; transition: background-color 0.2s;">
+                                🗑️ Eliminar Reserva
+                            </button>
+                        </div>
+                    ` : `
+                        <p style="color: #059669; font-weight: 600;">✅ Reserva finalizada</p>
+                        <div style="margin-top: 1rem;">
+                            <button onclick="cancelarReservaActiva(${reserva.id})" class="btn-cancel-reserva" type="button" style="width: 100%; background-color: #EF4444; color: white; padding: 0.75rem; border-radius: 8px; font-weight: 600; border: none; cursor: pointer;">
+                                🗑️ Eliminar Reserva
+                            </button>
+                        </div>
+                    `}
+                </div>
             </div>
         `;
     }).join('');
@@ -791,7 +808,7 @@ function updateUserProfile(userData) {
     const nameInput = document.getElementById('userName');
     const emailInput = document.getElementById('userEmail');
     const phoneInput = document.getElementById('userPhone');
-    
+
     if (nameInput) nameInput.value = userData.nombre || '';
     if (emailInput) emailInput.value = userData.email || '';
     if (phoneInput) phoneInput.value = userData.telefono || '';
@@ -800,7 +817,7 @@ function updateUserProfile(userData) {
 // Actualizar lista de reservas en la UI
 function updateReservasList(reservas) {
     const reservasContainer = document.getElementById('reservas-container');
-    
+
     if (reservasContainer) {
         if (reservas.length === 0) {
             reservasContainer.innerHTML = `
@@ -836,7 +853,7 @@ function updateReservasList(reservas) {
 // Función para reservar sala
 function reservarSala(salaId) {
     console.log('reservarSala llamado para sala:', salaId);
-    
+
     // Simplemente redirigir a la página de reservas - la validación de auth se hará ahí
     // Esto evita problemas de timing con la inicialización de Firebase
     window.location.href = `/reservations?sala=${salaId}`;
@@ -845,7 +862,7 @@ function reservarSala(salaId) {
 // ==================== INICIALIZACIÓN ====================
 
 // Verificar conexión con la API al cargar la página
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     try {
         await window.api.healthCheck();
         console.log('✅ API connection successful');
@@ -874,14 +891,17 @@ async function loadDisponibilidad(fecha = null) {
 
 // Cargar reservas activas del usuario
 async function loadReservasActivas(userId) {
+    console.log('loadReservasActivas called for user:', userId);
     try {
         const response = await window.api.getReservasActivas(userId);
+        console.log('loadReservasActivas response:', response);
         if (response.success) {
             return response.data;
         } else {
             throw new Error(response.message);
         }
     } catch (error) {
+        console.error('Error in loadReservasActivas:', error);
         handleApiError(error);
         return [];
     }

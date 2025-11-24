@@ -327,7 +327,7 @@ app.post('/api/reservas', (req, res) => {
     if (reservasActivas.length > 0) {
       return res.status(400).json({
         success: false,
-        message: 'Ya tienes una reserva activa. Debes esperar a que termine antes de hacer una nueva reserva.',
+        message: 'Ya tienes una reserva activa. Solo puedes tener una reserva a la vez.',
         reservaActiva: reservasActivas[0]
       });
     }
@@ -408,7 +408,10 @@ app.get('/api/reservas/:userId', (req, res) => {
 app.get('/api/reservas/usuario/:userId/activas', (req, res) => {
   try {
     const { userId } = req.params;
+    console.log(`[DEBUG] Getting active reservations for user: ${userId}`);
+
     const reservasActivas = getReservasActivasUsuario(userId);
+    console.log(`[DEBUG] Found ${reservasActivas.length} active reservations`);
 
     res.json({
       success: true,
@@ -416,6 +419,7 @@ app.get('/api/reservas/usuario/:userId/activas', (req, res) => {
       total: reservasActivas.length
     });
   } catch (error) {
+    console.error('[DEBUG] Error getting active reservations:', error);
     res.status(500).json({
       success: false,
       message: 'Error al obtener las reservas activas',

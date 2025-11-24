@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": 1763950091195,
+    "userId": "b5VsPddGlPW0XUSRGRxLGQQ44Pn1",
+    "salaId": 1,
+    "salaNombre": "Sala 201",
+    "fecha": "2025-11-24",
+    "horario": "13:00",
+    "duracion": 1.5,
+    "horaFin": "14:30",
+    "proposito": "Sesión de mentoría",
+    "participantes": 4,
+    "notas": "",
+    "estado": "confirmada",
+    "fechaCreacion": "2025-11-24T02:08:11.195Z"
+  }
+]
