@@ -1,329 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookey - Panel de Administración</title>
-    <style>
-        :root {
-            --primary: #0066FF;
-            --primary-light: #E6F0FF;
-            --background: #F5F6FA;
-            --card: #FFFFFF;
-            --text: #1E1E1E;
-            --text-light: #6B7280;
-            --border: #E5E7EB;
-            --accent: #F59E0B;
-            --danger: #EF4444;
-            --success: #10B981;
-            --radius: 12px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            background-color: var(--background);
-            color: var(--text);
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .nav-link:hover {
-            color: var(--primary);
-        }
-
-        .admin-badge {
-            background-color: var(--danger);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        /* Admin Panel */
-        .admin-panel {
-            background-color: var(--card);
-            border-radius: var(--radius);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .admin-title {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--text);
-            margin-bottom: 1rem;
-        }
-
-        .admin-subtitle {
-            color: var(--text-light);
-            margin-bottom: 2rem;
-        }
-
-        /* Form Section */
-        .form-section {
-            margin-bottom: 3rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--primary);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 0.5rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .form-textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            min-height: 100px;
-            resize: vertical;
-            font-family: inherit;
-        }
-
-        .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Salas List */
-        .salas-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .sala-card {
-            background-color: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .sala-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .sala-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 1rem;
-        }
-
-        .sala-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .sala-tipo {
-            background-color: var(--primary-light);
-            color: var(--primary);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .sala-description {
-            color: var(--text-light);
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .sala-details {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: var(--text-light);
-        }
-
-        .sala-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .message {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .message-success {
-            background-color: #D1FAE5;
-            color: #059669;
-            border: 1px solid #10B981;
-        }
-
-        .message-error {
-            background-color: #FEE2E2;
-            color: #DC2626;
-            border: 1px solid #EF4444;
-        }
-
-        .access-denied {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-        .access-denied-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .access-denied h2 {
-            font-size: 2rem;
-            color: var(--text);
-            margin-bottom: 1rem;
-        }
-
-        .access-denied p {
-            color: var(--text-light);
-            margin-bottom: 2rem;
-        }
-
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-light);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .salas-list {
-                grid-template-columns: 1fr;
-            }
-
-            .header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -347,62 +32,172 @@
 
         <!-- Admin Panel (shown if admin) -->
         <div id="adminContent" style="display: none;">
-            <div class="admin-panel">
-                <h1 class="admin-title">Panel de Administración</h1>
-                <p class="admin-subtitle">Gestiona las salas de mentoría del sistema</p>
+            <!-- Tabs Navigation -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchTab('salas')">Gestionar Salas</button>
+                <button class="tab-btn" onclick="switchTab('reservas')">Todas las Reservas</button>
+                <button class="tab-btn" onclick="switchTab('historial')">Historial Completo</button>
+            </div>
 
-                <!-- Messages -->
-                <div id="successMessage" class="message message-success"></div>
-                <div id="errorMessage" class="message message-error"></div>
+            <!-- Messages -->
+            <div id="successMessage" class="message message-success"></div>
+            <div id="errorMessage" class="message message-error"></div>
 
-                <!-- Form Section -->
-                <div class="form-section">
-                    <h2 class="section-title">Crear Nueva Sala</h2>
-                    <form id="createSalaForm">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="nombre" class="form-label">Nombre de la Sala *</label>
-                                <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Ej: Sala 208" required>
+            <!-- Tab: Gestionar Salas -->
+            <div id="tab-salas" class="admin-tab-content active">
+                <div class="admin-panel">
+                    <h1 class="admin-title">Panel de Administración - Salas</h1>
+                    <p class="admin-subtitle">Gestiona las salas de mentoría del sistema</p>
+
+                    <!-- Form Section -->
+                    <div class="form-section">
+                        <h2 class="section-title">Crear Nueva Sala</h2>
+                        <form id="createSalaForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="nombre" class="form-label">Nombre de la Sala *</label>
+                                    <input type="text" id="nombre" name="nombre" class="form-input"
+                                        placeholder="Ej: Sala 208" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tipo" class="form-label">Tipo *</label>
+                                    <input type="text" id="tipo" name="tipo" class="form-input"
+                                        placeholder="Ej: Corporate, Cognata, etc." required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="capacidad" class="form-label">Capacidad *</label>
+                                    <input type="number" id="capacidad" name="capacidad" class="form-input"
+                                        placeholder="Ej: 6" min="1" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="imagen" class="form-label">URL de Imagen</label>
+                                    <input type="url" id="imagen" name="imagen" class="form-input"
+                                        placeholder="https://...">
+                                </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="tipo" class="form-label">Tipo *</label>
-                                <input type="text" id="tipo" name="tipo" class="form-input" placeholder="Ej: Corporate, Cognata, etc." required>
+                                <label for="descripcion" class="form-label">Descripción *</label>
+                                <textarea id="descripcion" name="descripcion" class="form-textarea"
+                                    placeholder="Describe la sala y sus características..." required></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label for="capacidad" class="form-label">Capacidad *</label>
-                                <input type="number" id="capacidad" name="capacidad" class="form-input" placeholder="Ej: 6" min="1" required>
+                                <label for="equipamiento" class="form-label">Equipamiento (separado por comas)</label>
+                                <input type="text" id="equipamiento" name="equipamiento" class="form-input"
+                                    placeholder="WiFi, Proyector, Aire acondicionado">
                             </div>
 
-                            <div class="form-group">
-                                <label for="imagen" class="form-label">URL de Imagen</label>
-                                <input type="url" id="imagen" name="imagen" class="form-input" placeholder="https://...">
-                            </div>
+                            <button type="submit" class="btn btn-primary" id="createBtn">
+                                Crear Sala
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Salas List Section -->
+                    <div class="form-section">
+                        <h2 class="section-title">Gestionar Salas Existentes</h2>
+                        <div class="loading" id="loadingSalas">Cargando salas...</div>
+                        <div class="salas-list" id="salasList">
+                            <!-- Las salas se cargarán dinámicamente aquí -->
                         </div>
-
-                        <div class="form-group">
-                            <label for="descripcion" class="form-label">Descripción *</label>
-                            <textarea id="descripcion" name="descripcion" class="form-textarea" placeholder="Describe la sala y sus características..." required></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="equipamiento" class="form-label">Equipamiento (separado por comas)</label>
-                            <input type="text" id="equipamiento" name="equipamiento" class="form-input" placeholder="WiFi, Proyector, Aire acondicionado">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary" id="createBtn">
-                            Crear Sala
-                        </button>
-                    </form>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Salas List Section -->
-                <div class="form-section">
-                    <h2 class="section-title">Gestionar Salas Existentes</h2>
-                    <div class="loading" id="loadingSalas">Cargando salas...</div>
-                    <div class="salas-list" id="salasList">
-                        <!-- Las salas se cargarán dinámicamente aquí -->
+            <!-- Tab: Todas las Reservas -->
+            <div id="tab-reservas" class="admin-tab-content">
+                <div class="admin-panel">
+                    <h1 class="admin-title">Todas las Reservas</h1>
+                    <p class="admin-subtitle">Visualiza y gestiona todas las reservas del sistema</p>
+
+                    <!-- Filtros -->
+                    <div class="filters-section">
+                        <div class="filter-group">
+                            <label for="filterUsuario">Filtrar por Usuario:</label>
+                            <input type="text" id="filterUsuario" class="form-input" 
+                                placeholder="ID, email o nombre" oninput="filtrarReservas()">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterSala">Filtrar por Sala:</label>
+                            <select id="filterSala" class="form-input" onchange="filtrarReservas()">
+                                <option value="">Todas las salas</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterEstado">Filtrar por Estado:</label>
+                            <select id="filterEstado" class="form-input" onchange="filtrarReservas()">
+                                <option value="">Todos los estados</option>
+                                <option value="confirmada">Confirmadas (Activas)</option>
+                                <option value="cancelada">Canceladas</option>
+                                <option value="completada">Completadas</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterFecha">Filtrar por Fecha:</label>
+                            <input type="date" id="filterFecha" class="form-input" onchange="filtrarReservas()">
+                        </div>
+                        <div class="filter-group" style="grid-column: 1 / -1;">
+                            <button onclick="limpiarFiltrosReservas()" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem;">
+                                Limpiar Filtros
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas -->
+                    <div class="stats-grid" id="reservasStats">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+
+                    <!-- Lista de Reservas -->
+                    <div class="loading" id="loadingReservas">Cargando reservas...</div>
+                    <div class="reservas-admin-list" id="reservasList">
+                        <!-- Las reservas se cargarán dinámicamente aquí -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Historial Completo -->
+            <div id="tab-historial" class="admin-tab-content">
+                <div class="admin-panel">
+                    <h1 class="admin-title">Historial de Reservas</h1>
+                    <p class="admin-subtitle">Historial completo de todas las reservas realizadas</p>
+
+                    <!-- Filtros avanzados -->
+                    <div class="filters-section">
+                        <div class="filter-group">
+                            <label for="historialFilterUsuario">Filtrar por Usuario:</label>
+                            <input type="text" id="historialFilterUsuario" class="form-input" 
+                                placeholder="ID de usuario o email" onchange="filtrarHistorial()">
+                        </div>
+                        <div class="filter-group">
+                            <label for="historialFilterSala">Filtrar por Sala:</label>
+                            <select id="historialFilterSala" class="form-input" onchange="filtrarHistorial()">
+                                <option value="">Todas las salas</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="historialFilterFechaInicio">Desde:</label>
+                            <input type="date" id="historialFilterFechaInicio" class="form-input" onchange="filtrarHistorial()">
+                        </div>
+                        <div class="filter-group">
+                            <label for="historialFilterFechaFin">Hasta:</label>
+                            <input type="date" id="historialFilterFechaFin" class="form-input" onchange="filtrarHistorial()">
+                        </div>
+                        <div class="filter-group" style="grid-column: 1 / -1;">
+                            <button onclick="limpiarFiltrosHistorial()" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem;">
+                                Limpiar Filtros
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Historial -->
+                    <div class="loading" id="loadingHistorial">Cargando historial...</div>
+                    <div class="historial-list" id="historialList">
+                        <!-- El historial se cargará dinámicamente aquí -->
                     </div>
                 </div>
             </div>
@@ -413,13 +208,15 @@
     <script src="/js/auth.js"></script>
     <!-- Include API Script -->
     <script src="/js/api.js"></script>
-    
+
     <script>
         let currentUserId = null;
+        let todasLasReservas = [];
+        let todasLasSalas = [];
+        let usuariosMap = {}; // Mapa de userId -> información de usuario
 
         // Verificar acceso de admin
         async function checkAdminAccess() {
-            // Esperar a que Firebase se inicialice
             if (!window.auth || !window.auth.isAuthenticated()) {
                 document.getElementById('accessDenied').style.display = 'block';
                 return false;
@@ -433,11 +230,8 @@
 
             currentUserId = user.uid;
 
-            // Verificar rol de admin
             const isAdmin = window.auth.isAdmin();
-            
             if (!isAdmin) {
-                // Intentar verificar desde Firestore
                 const role = await window.auth.getUserRoleFromFirestore(user.uid);
                 if (role !== 'admin') {
                     document.getElementById('accessDenied').style.display = 'block';
@@ -445,9 +239,42 @@
                 }
             }
 
-            // Si es admin, mostrar contenido
             document.getElementById('adminContent').style.display = 'block';
             return true;
+        }
+
+        // Cambiar entre tabs
+        function switchTab(tabName) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.admin-tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar tab seleccionado
+            const tabElement = document.getElementById(`tab-${tabName}`);
+            if (tabElement) {
+                tabElement.classList.add('active');
+            }
+            
+            // Activar botón correspondiente
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes(tabName === 'salas' ? 'Gestionar Salas' : 
+                                              tabName === 'reservas' ? 'Todas las Reservas' : 
+                                              'Historial Completo')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Cargar datos según el tab
+            if (tabName === 'reservas') {
+                loadTodasLasReservas();
+            } else if (tabName === 'historial') {
+                loadHistorial();
+            }
         }
 
         // Cargar salas
@@ -455,13 +282,31 @@
             try {
                 const response = await window.api.getSalas();
                 if (response.success) {
+                    todasLasSalas = response.data;
                     displaySalas(response.data);
+                    populateSalaFilters(response.data);
                 } else {
                     throw new Error(response.message);
                 }
             } catch (error) {
                 console.error('Error loading salas:', error);
                 showError('Error al cargar las salas: ' + error.message);
+            }
+        }
+
+        // Poblar filtros de salas
+        function populateSalaFilters(salas) {
+            const filterSala = document.getElementById('filterSala');
+            const historialFilterSala = document.getElementById('historialFilterSala');
+            
+            if (filterSala) {
+                filterSala.innerHTML = '<option value="">Todas las salas</option>' + 
+                    salas.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
+            }
+            
+            if (historialFilterSala) {
+                historialFilterSala.innerHTML = '<option value="">Todas las salas</option>' + 
+                    salas.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
             }
         }
 
@@ -477,7 +322,14 @@
             }
 
             loadingSalas.style.display = 'none';
-            salasList.innerHTML = salas.map(sala => `
+            salasList.innerHTML = salas.map(sala => {
+                // Contar reservas de esta sala
+                const reservasSala = todasLasReservas.filter(r => r.salaId === sala.id);
+                const reservasActivas = reservasSala.filter(r => 
+                    r.estado === 'confirmada' && esReservaActiva(r)
+                );
+
+                return `
                 <div class="sala-card">
                     <div class="sala-header">
                         <h3 class="sala-title">${sala.nombre}</h3>
@@ -487,6 +339,8 @@
                     <div class="sala-details">
                         <span>Capacidad: ${sala.capacidad}</span>
                         <span>Equipos: ${sala.equipamiento.length}</span>
+                        <span>Reservas activas: ${reservasActivas.length}</span>
+                        <span>Total reservas: ${reservasSala.length}</span>
                     </div>
                     <div class="sala-actions">
                         <button onclick="eliminarSala(${sala.id})" class="btn btn-danger">
@@ -494,7 +348,373 @@
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
+        }
+
+        // Cargar todas las reservas
+        async function loadTodasLasReservas() {
+            const loadingReservas = document.getElementById('loadingReservas');
+            loadingReservas.style.display = 'block';
+
+            try {
+                const response = await window.api.getReservas();
+                if (response.success) {
+                    todasLasReservas = response.data;
+                    await cargarInformacionUsuarios(response.data);
+                    displayReservas(response.data);
+                    displayReservasStats(response.data);
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Error loading reservas:', error);
+                showError('Error al cargar las reservas: ' + error.message);
+            } finally {
+                loadingReservas.style.display = 'none';
+            }
+        }
+
+        // Cargar información de usuarios desde Firestore
+        async function cargarInformacionUsuarios(reservas) {
+            if (!window.auth || !window.auth.getDb) return;
+            
+            const db = window.auth.getDb();
+            if (!db) {
+                console.warn('Firestore no está disponible');
+                return;
+            }
+            
+            const userIds = [...new Set(reservas.map(r => r.userId).filter(id => id))];
+            
+            if (userIds.length === 0) return;
+            
+            try {
+                const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                
+                // Cargar usuarios en paralelo para mejor rendimiento
+                const userPromises = userIds.map(async (userId) => {
+                    if (!usuariosMap[userId]) {
+                        try {
+                            const userRef = doc(db, 'users', userId);
+                            const userSnap = await getDoc(userRef);
+                            
+                            if (userSnap.exists()) {
+                                usuariosMap[userId] = userSnap.data();
+                            } else {
+                                usuariosMap[userId] = {
+                                    email: userId.includes('@') ? userId : `${userId}@desconocido.com`,
+                                    displayName: 'Usuario desconocido',
+                                    uid: userId
+                                };
+                            }
+                        } catch (error) {
+                            console.error(`Error cargando usuario ${userId}:`, error);
+                            usuariosMap[userId] = {
+                                email: userId.includes('@') ? userId : `${userId}@desconocido.com`,
+                                displayName: 'Usuario desconocido',
+                                uid: userId
+                            };
+                        }
+                    }
+                });
+                
+                await Promise.all(userPromises);
+            } catch (error) {
+                console.error('Error cargando usuarios:', error);
+            }
+        }
+
+        // Mostrar estadísticas de reservas
+        function displayReservasStats(reservas) {
+            const statsGrid = document.getElementById('reservasStats');
+            if (!statsGrid) return;
+            
+            if (!reservas || reservas.length === 0) {
+                statsGrid.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 1rem;">No hay datos para mostrar</p>';
+                return;
+            }
+            
+            const total = reservas.length;
+            const activas = reservas.filter(r => r.estado === 'confirmada' && esReservaActiva(r)).length;
+            const canceladas = reservas.filter(r => r.estado === 'cancelada').length;
+            const completadas = reservas.filter(r => 
+                r.estado === 'confirmada' && !esReservaActiva(r)
+            ).length;
+            const salasReservadas = new Set(reservas.map(r => r.salaId).filter(id => id)).size;
+            const usuariosUnicos = new Set(reservas.map(r => r.userId).filter(id => id)).size;
+
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${total}</div>
+                    <div class="stat-label">Total Reservas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${activas}</div>
+                    <div class="stat-label">Reservas Activas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${salasReservadas}</div>
+                    <div class="stat-label">Salas Reservadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${usuariosUnicos}</div>
+                    <div class="stat-label">Usuarios Únicos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${completadas}</div>
+                    <div class="stat-label">Completadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${canceladas}</div>
+                    <div class="stat-label">Canceladas</div>
+                </div>
+            `;
+        }
+
+        // Mostrar reservas
+        function displayReservas(reservas) {
+            const reservasList = document.getElementById('reservasList');
+            
+            if (!reservas || reservas.length === 0) {
+                reservasList.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">No hay reservas para mostrar.</p>';
+                return;
+            }
+
+            // Ordenar por fecha de creación (más recientes primero)
+            const reservasOrdenadas = [...reservas].sort((a, b) => {
+                const fechaA = new Date(a.fechaCreacion || 0);
+                const fechaB = new Date(b.fechaCreacion || 0);
+                return fechaB - fechaA;
+            });
+
+            reservasList.innerHTML = reservasOrdenadas.map(reserva => {
+                const usuario = usuariosMap[reserva.userId] || {
+                    displayName: 'Usuario desconocido',
+                    email: reserva.userId || 'N/A'
+                };
+                const sala = todasLasSalas.find(s => s.id === reserva.salaId) || { nombre: reserva.salaNombre || 'Sala desconocida' };
+                const esActiva = reserva.estado === 'confirmada' && esReservaActiva(reserva);
+                const horaFin = reserva.horaFin || calcularHoraFin(reserva.horario, reserva.duracion);
+                
+                return `
+                <div class="reserva-admin-card">
+                    <div class="reserva-admin-header">
+                        <div>
+                            <h3 class="reserva-admin-title">${reserva.salaNombre || sala.nombre}</h3>
+                            <div style="margin-top: 0.5rem;">
+                                <span class="reserva-admin-badge ${reserva.estado || 'confirmada'}">${reserva.estado || 'confirmada'}</span>
+                                ${esActiva ? '<span class="reserva-admin-badge activa">Activa</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reserva-admin-body">
+                        <div class="reserva-admin-info">
+                            <p><strong>Usuario:</strong> ${usuario.displayName || usuario.email || reserva.userId || 'N/A'}</p>
+                            <p><strong>Email:</strong> ${usuario.email || reserva.userId || 'N/A'}</p>
+                            <p><strong>ID Usuario:</strong> <code style="font-size: 0.85rem; background: #f0f0f0; padding: 0.2rem 0.4rem; border-radius: 4px;">${reserva.userId || 'N/A'}</code></p>
+                            <p><strong>Fecha:</strong> ${reserva.fecha ? formatDate(reserva.fecha) : 'N/A'}</p>
+                            <p><strong>Horario:</strong> ${reserva.horario ? formatTime(reserva.horario) : 'N/A'} - ${horaFin ? formatTime(horaFin) : 'N/A'}</p>
+                            <p><strong>Duración:</strong> ${reserva.duracion || 0} horas</p>
+                            <p><strong>Propósito:</strong> ${reserva.proposito || 'N/A'}</p>
+                            <p><strong>Participantes:</strong> ${reserva.participantes || 0}</p>
+                            ${reserva.notas ? `<p><strong>Notas:</strong> ${reserva.notas}</p>` : ''}
+                            <p><strong>Fecha de creación:</strong> ${reserva.fechaCreacion ? new Date(reserva.fechaCreacion).toLocaleString('es-ES') : 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Filtrar reservas
+        function filtrarReservas() {
+            const filterUsuario = document.getElementById('filterUsuario')?.value?.toLowerCase() || '';
+            const filterSala = document.getElementById('filterSala')?.value || '';
+            const filterEstado = document.getElementById('filterEstado')?.value || '';
+            const filterFecha = document.getElementById('filterFecha')?.value || '';
+
+            let reservasFiltradas = [...todasLasReservas];
+
+            if (filterUsuario) {
+                reservasFiltradas = reservasFiltradas.filter(r => {
+                    if (!r.userId) return false;
+                    const usuario = usuariosMap[r.userId] || {};
+                    const userIdLower = (r.userId || '').toLowerCase();
+                    const emailLower = (usuario.email || '').toLowerCase();
+                    const displayNameLower = (usuario.displayName || '').toLowerCase();
+                    
+                    return userIdLower.includes(filterUsuario) ||
+                           emailLower.includes(filterUsuario) ||
+                           displayNameLower.includes(filterUsuario);
+                });
+            }
+
+            if (filterSala) {
+                reservasFiltradas = reservasFiltradas.filter(r => r.salaId === parseInt(filterSala));
+            }
+
+            if (filterEstado) {
+                if (filterEstado === 'confirmada') {
+                    reservasFiltradas = reservasFiltradas.filter(r => 
+                        r.estado === 'confirmada' && esReservaActiva(r)
+                    );
+                } else if (filterEstado === 'completada') {
+                    reservasFiltradas = reservasFiltradas.filter(r => 
+                        r.estado === 'confirmada' && !esReservaActiva(r)
+                    );
+                } else {
+                    reservasFiltradas = reservasFiltradas.filter(r => r.estado === filterEstado);
+                }
+            }
+
+            if (filterFecha) {
+                reservasFiltradas = reservasFiltradas.filter(r => r.fecha === filterFecha);
+            }
+
+            displayReservas(reservasFiltradas);
+            // Actualizar estadísticas con las reservas filtradas
+            displayReservasStats(reservasFiltradas);
+        }
+
+        // Limpiar filtros de reservas
+        function limpiarFiltrosReservas() {
+            document.getElementById('filterUsuario').value = '';
+            document.getElementById('filterSala').value = '';
+            document.getElementById('filterEstado').value = '';
+            document.getElementById('filterFecha').value = '';
+            filtrarReservas();
+        }
+
+        // Cargar historial
+        async function loadHistorial() {
+            const loadingHistorial = document.getElementById('loadingHistorial');
+            loadingHistorial.style.display = 'block';
+
+            try {
+                const response = await window.api.getReservas();
+                if (response.success) {
+                    todasLasReservas = response.data;
+                    await cargarInformacionUsuarios(response.data);
+                    displayHistorial(response.data);
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                console.error('Error loading historial:', error);
+                showError('Error al cargar el historial: ' + error.message);
+            } finally {
+                loadingHistorial.style.display = 'none';
+            }
+        }
+
+        // Mostrar historial
+        function displayHistorial(reservas) {
+            const historialList = document.getElementById('historialList');
+            
+            if (!reservas || reservas.length === 0) {
+                historialList.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">No hay historial disponible.</p>';
+                return;
+            }
+            
+            // Ordenar por fecha de creación (más recientes primero)
+            const reservasOrdenadas = [...reservas].sort((a, b) => {
+                const fechaA = new Date(a.fechaCreacion || a.fecha || 0);
+                const fechaB = new Date(b.fechaCreacion || b.fecha || 0);
+                return fechaB - fechaA;
+            });
+
+            historialList.innerHTML = reservasOrdenadas.map(reserva => {
+                const usuario = usuariosMap[reserva.userId] || {
+                    displayName: 'Usuario desconocido',
+                    email: reserva.userId || 'N/A'
+                };
+                const sala = todasLasSalas.find(s => s.id === reserva.salaId) || { nombre: reserva.salaNombre || 'Sala desconocida' };
+                const esActiva = reserva.estado === 'confirmada' && esReservaActiva(reserva);
+                const horaFin = reserva.horaFin || calcularHoraFin(reserva.horario, reserva.duracion);
+                
+                return `
+                <div class="historial-card">
+                    <div class="historial-header">
+                        <div>
+                            <h3>${reserva.salaNombre || sala.nombre}</h3>
+                            <p class="historial-usuario">Usuario: ${usuario.displayName || usuario.email || reserva.userId || 'N/A'}</p>
+                            <p class="historial-usuario" style="font-size: 0.8rem; margin-top: 0.25rem;">
+                                <code style="background: #f0f0f0; padding: 0.2rem 0.4rem; border-radius: 4px;">${reserva.userId || 'N/A'}</code>
+                            </p>
+                        </div>
+                        <div class="historial-badges">
+                            <span class="historial-badge ${reserva.estado || 'confirmada'}">${reserva.estado || 'confirmada'}</span>
+                            ${esActiva ? '<span class="historial-badge activa">Activa</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="historial-body">
+                        <div class="historial-details">
+                            <p><strong>Fecha:</strong> ${reserva.fecha ? formatDate(reserva.fecha) : 'N/A'}</p>
+                            <p><strong>Horario:</strong> ${reserva.horario ? formatTime(reserva.horario) : 'N/A'} - ${horaFin ? formatTime(horaFin) : 'N/A'}</p>
+                            <p><strong>Duración:</strong> ${reserva.duracion || 0} horas</p>
+                            <p><strong>Propósito:</strong> ${reserva.proposito || 'N/A'}</p>
+                            <p><strong>Participantes:</strong> ${reserva.participantes || 0}</p>
+                            ${reserva.notas ? `<p><strong>Notas:</strong> ${reserva.notas}</p>` : ''}
+                            <p><strong>Fecha de creación:</strong> ${reserva.fechaCreacion ? new Date(reserva.fechaCreacion).toLocaleString('es-ES') : 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Filtrar historial
+        function filtrarHistorial() {
+            const filterUsuario = document.getElementById('historialFilterUsuario')?.value?.toLowerCase() || '';
+            const filterSala = document.getElementById('historialFilterSala')?.value || '';
+            const filterFechaInicio = document.getElementById('historialFilterFechaInicio')?.value || '';
+            const filterFechaFin = document.getElementById('historialFilterFechaFin')?.value || '';
+
+            let reservasFiltradas = [...todasLasReservas];
+
+            if (filterUsuario) {
+                reservasFiltradas = reservasFiltradas.filter(r => {
+                    if (!r.userId) return false;
+                    const usuario = usuariosMap[r.userId] || {};
+                    const userIdLower = (r.userId || '').toLowerCase();
+                    const emailLower = (usuario.email || '').toLowerCase();
+                    const displayNameLower = (usuario.displayName || '').toLowerCase();
+                    
+                    return userIdLower.includes(filterUsuario) ||
+                           emailLower.includes(filterUsuario) ||
+                           displayNameLower.includes(filterUsuario);
+                });
+            }
+
+            if (filterSala) {
+                reservasFiltradas = reservasFiltradas.filter(r => r.salaId === parseInt(filterSala));
+            }
+
+            if (filterFechaInicio) {
+                reservasFiltradas = reservasFiltradas.filter(r => r.fecha && r.fecha >= filterFechaInicio);
+            }
+
+            if (filterFechaFin) {
+                reservasFiltradas = reservasFiltradas.filter(r => r.fecha && r.fecha <= filterFechaFin);
+            }
+
+            displayHistorial(reservasFiltradas);
+        }
+
+        // Funciones auxiliares
+        function esReservaActiva(reserva) {
+            const ahora = new Date();
+            const fechaReserva = new Date(reserva.fecha + 'T' + (reserva.horaFin || calcularHoraFin(reserva.horario, reserva.duracion)));
+            return fechaReserva > ahora && reserva.estado === 'confirmada';
+        }
+
+        function calcularHoraFin(horario, duracion) {
+            const [hora, minuto] = horario.split(':').map(Number);
+            const totalMinutos = hora * 60 + minuto + (duracion * 60);
+            const nuevaHora = Math.floor(totalMinutos / 60);
+            const nuevoMinuto = totalMinutos % 60;
+            return `${String(nuevaHora).padStart(2, '0')}:${String(nuevoMinuto).padStart(2, '0')}`;
         }
 
         // Crear nueva sala
@@ -519,7 +739,6 @@
                     .filter(e => e.length > 0) || ['WiFi', 'Proyector', 'Aire acondicionado']
             };
 
-            // Validar campos requeridos
             if (!formData.nombre || !formData.tipo || !formData.descripcion || !formData.capacidad) {
                 showError('Por favor completa todos los campos requeridos');
                 return;
@@ -534,7 +753,7 @@
                 if (response.success) {
                     showSuccess('Sala creada exitosamente');
                     document.getElementById('createSalaForm').reset();
-                    await loadSalas(); // Recargar lista
+                    await loadSalas();
                 } else {
                     throw new Error(response.message);
                 }
@@ -562,7 +781,7 @@
                 const response = await window.api.eliminarSala(salaId, currentUserId);
                 if (response.success) {
                     showSuccess('Sala eliminada exitosamente');
-                    await loadSalas(); // Recargar lista
+                    await loadSalas();
                 } else {
                     throw new Error(response.message);
                 }
@@ -576,7 +795,7 @@
         function showSuccess(message) {
             const successMsg = document.getElementById('successMessage');
             const errorMsg = document.getElementById('errorMessage');
-            
+
             errorMsg.style.display = 'none';
             successMsg.textContent = message;
             successMsg.style.display = 'block';
@@ -590,7 +809,7 @@
         function showError(message) {
             const successMsg = document.getElementById('successMessage');
             const errorMsg = document.getElementById('errorMessage');
-            
+
             successMsg.style.display = 'none';
             errorMsg.textContent = message;
             errorMsg.style.display = 'block';
@@ -601,14 +820,12 @@
         }
 
         // Inicializar página
-        document.addEventListener('DOMContentLoaded', async function() {
-            // Esperar a que Firebase se inicialice
+        document.addEventListener('DOMContentLoaded', async function () {
             setTimeout(async () => {
-                // Actualizar UI de autenticación
                 if (window.auth) {
                     window.auth.updateUI();
                 }
-                
+
                 const hasAccess = await checkAdminAccess();
                 if (hasAccess) {
                     await loadSalas();
@@ -617,10 +834,23 @@
             }, 1000);
         });
 
+        // Limpiar filtros de historial
+        function limpiarFiltrosHistorial() {
+            document.getElementById('historialFilterUsuario').value = '';
+            document.getElementById('historialFilterSala').value = '';
+            document.getElementById('historialFilterFechaInicio').value = '';
+            document.getElementById('historialFilterFechaFin').value = '';
+            filtrarHistorial();
+        }
+
         // Exportar funciones globalmente
         window.eliminarSala = eliminarSala;
+        window.switchTab = switchTab;
+        window.filtrarReservas = filtrarReservas;
+        window.filtrarHistorial = filtrarHistorial;
+        window.limpiarFiltrosReservas = limpiarFiltrosReservas;
+        window.limpiarFiltrosHistorial = limpiarFiltrosHistorial;
     </script>
 </body>
+
 </html>
-
-

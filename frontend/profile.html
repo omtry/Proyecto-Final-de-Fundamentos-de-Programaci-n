@@ -1,211 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookey - Perfil de Usuario</title>
-    <style>
-        :root {
-            --primary: #0066FF;
-            --primary-light: #E6F0FF;
-            --background: #F5F6FA;
-            --card: #FFFFFF;
-            --text: #1E1E1E;
-            --text-light: #6B7280;
-            --border: #E5E7EB;
-            --accent: #F59E0B;
-            --radius: 12px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            background-color: var(--background);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .logo:hover {
-            opacity: 0.8;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .nav-link {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .nav-link:hover {
-            color: var(--primary);
-        }
-
-        .nav-link.active {
-            color: var(--primary);
-        }
-
-        .nav-links #userInfo {
-            margin-left: 0;
-        }
-
-        /* Profile Content */
-        .profile-container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .profile-card {
-            background-color: var(--card);
-            border-radius: var(--radius);
-            padding: 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--primary);
-            color: white;
-            font-size: 2rem;
-            font-weight: bold;
-            border: 3px solid var(--primary-light);
-        }
-
-
-        .profile-name {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--text);
-            margin-bottom: 0.5rem;
-        }
-
-        .profile-email {
-            font-size: 1.1rem;
-            color: var(--text-light);
-            margin-bottom: 2rem;
-        }
-
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: var(--text);
-            font-size: 1.1rem;
-        }
-
-        .info-value {
-            font-weight: 500;
-            color: var(--text-light);
-            font-family: monospace;
-            font-size: 1rem;
-        }
-
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-            margin: 0.5rem;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background-color: #EF4444;
-        }
-
-        .btn-danger:hover {
-            background-color: #DC2626;
-        }
-
-        .btn-group {
-            margin-top: 2rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                justify-content: center;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .profile-card {
-                padding: 1.5rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/profile.css">
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -238,9 +41,12 @@
                 </div>
 
                 <!-- Sección de Reserva Activa -->
-                <div id="reservaActivaSection" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); display: none;">
+                <div id="reservaActivaSection"
+                    style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); display: none;">
                     <h3 style="color: var(--primary); margin-bottom: 1rem;">Tu Reserva Actual</h3>
-                    <div id="reservaActivaContent" style="background-color: var(--primary-light); padding: 1rem; border-radius: var(--radius);"></div>
+                    <div id="reservaActivaContent"
+                        style="background-color: var(--primary-light); padding: 1rem; border-radius: var(--radius);">
+                    </div>
                 </div>
 
                 <div class="btn-group">
@@ -257,30 +63,30 @@
         // Update profile information
         function updateProfileInfo() {
             console.log('updateProfileInfo called');
-            
+
             // Wait for auth to be available
             if (!window.auth) {
                 console.log('Auth not available yet, retrying...');
                 setTimeout(updateProfileInfo, 500);
                 return;
             }
-            
+
             const user = window.auth.getCurrentUser();
             console.log('Current user:', user);
-            
+
             if (user) {
                 // Get real user data
                 const displayName = user.displayName || user.email.split('@')[0];
                 const email = user.email;
-                
+
                 console.log('Updating profile with:', { displayName, email });
-                
+
                 // Update avatar with user's initial
                 const avatar = document.getElementById('profileAvatar');
                 if (avatar) {
                     avatar.textContent = displayName.charAt(0).toUpperCase();
                 }
-                
+
                 // Update header info
                 const profileNameEl = document.getElementById('profileName');
                 const profileEmailEl = document.getElementById('profileEmail');
@@ -292,9 +98,9 @@
                 const infoEmailEl = document.getElementById('infoEmail');
                 if (infoNameEl) infoNameEl.textContent = displayName;
                 if (infoEmailEl) infoEmailEl.textContent = email;
-                
+
                 console.log('Profile updated successfully');
-                
+
                 // Cargar reserva activa
                 loadReservaActiva(user.uid);
             } else {
@@ -310,7 +116,7 @@
                 const response = await window.api.getReservasUsuario(userId);
                 if (response.success && response.data.length > 0) {
                     const reservaActiva = response.data.find(r => r.estado === 'confirmada');
-                    
+
                     if (reservaActiva) {
                         displayReservaActiva(reservaActiva);
                     } else {
@@ -329,19 +135,19 @@
         function displayReservaActiva(reserva) {
             const section = document.getElementById('reservaActivaSection');
             const content = document.getElementById('reservaActivaContent');
-            
+
             if (!section || !content) return;
-            
+
             // Calcular hora de finalización
             const [startHour, startMinute] = reserva.horario.split(':').map(Number);
             const endHour = startHour + reserva.duracion;
             const endTimeStr = `${endHour}:${String(startMinute).padStart(2, '0')}`;
-            
+
             // Calcular tiempo hasta que termine la reserva
             const reservaDate = new Date(`${reserva.fecha}T${reserva.horario}:00`);
             const endDate = new Date(`${reserva.fecha}T${endTimeStr}:00`);
             const now = new Date();
-            
+
             content.innerHTML = `
                 <div style="margin-bottom: 1rem;">
                     <strong style="color: var(--text);">Sala: ${reserva.salaNombre}</strong>
@@ -364,15 +170,15 @@
                     </p>
                 </div>
             `;
-            
+
             section.style.display = 'block';
         }
 
         // Listen for auth state changes
-        window.addEventListener('authStateChanged', function(event) {
+        window.addEventListener('authStateChanged', function (event) {
             console.log('Auth state change event received:', event.detail);
             const { user, isAuthenticated } = event.detail;
-            
+
             if (isAuthenticated && user) {
                 console.log('User authenticated, updating profile...');
                 updateProfileInfo();
@@ -384,24 +190,24 @@
 
         // Timeout to prevent infinite loading
         let loadingTimeout;
-        
+
         // Check authentication and update profile
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             console.log('DOM loaded, initializing profile...');
-            
+
             // Set timeout to prevent infinite loading
             loadingTimeout = setTimeout(() => {
                 console.log('Loading timeout reached, redirecting to login...');
                 window.location.href = '/login';
             }, 10000); // 10 seconds timeout
-            
+
             // Wait for auth to initialize
             const waitForAuth = () => {
                 if (window.auth) {
                     console.log('Auth available, checking authentication...');
                     clearTimeout(loadingTimeout); // Clear timeout
                     window.auth.updateUI();
-                    
+
                     // Check if user is authenticated
                     if (window.auth.isAuthenticated()) {
                         console.log('User is authenticated, updating profile...');
@@ -415,10 +221,11 @@
                     setTimeout(waitForAuth, 500);
                 }
             };
-            
+
             // Start checking after a short delay
             setTimeout(waitForAuth, 1000);
         });
     </script>
 </body>
+
 </html>

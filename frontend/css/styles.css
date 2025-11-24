@@ -1,0 +1,1549 @@
+:root {
+    --primary: #0066FF;
+    --primary-light: #E6F0FF;
+    --background: #F5F6FA;
+    --card: #FFFFFF;
+    --text: #1E1E1E;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --accent: #F59E0B;
+    --radius: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    flex: 1;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: var(--primary);
+}
+
+.nav-link.active {
+    color: var(--primary);
+}
+
+/* Buttons */
+.btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn:hover {
+    background-color: var(--primary);
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Cards */
+.card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    margin: 4rem 0;
+    padding: 3rem 0;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+}
+
+/* Features Section */
+.features {
+    margin: 4rem 0;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto 1.5rem;
+}
+
+.feature-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.feature-description {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+/* Rooms List */
+.rooms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.room-card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    padding: 0;
+    /* Reset padding for room cards as they have internal padding */
+}
+
+.room-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.room-content {
+    display: flex;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.room-image {
+    width: 200px;
+    height: 200px;
+    border-radius: var(--radius);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.room-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px;
+}
+
+.room-header {
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.room-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text);
+    margin: 0;
+}
+
+.availability-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.availability-badge.disponible {
+    background-color: #D1FAE5;
+    color: #059669;
+}
+
+.availability-badge.ocupada {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
+.reserva-info {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+/* Mis Reservas Activas Section */
+.my-reservations {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.my-reservations-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.reserva-activa-card {
+    background-color: var(--primary-light);
+    border-left: 4px solid var(--primary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.reserva-activa-card h4 {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.reserva-activa-card p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+}
+
+.btn-cancel-reserva {
+    background-color: #EF4444;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-cancel-reserva:hover {
+    background-color: #DC2626;
+    transform: translateY(-1px);
+}
+
+.btn-cancel-reserva:active {
+    transform: translateY(0);
+}
+
+.no-reservas-activas {
+    color: var(--text-light);
+    text-align: center;
+    padding: 1rem;
+}
+
+.warning-message {
+    background-color: #FEF3C7;
+    border: 1px solid #F59E0B;
+    color: #92400E;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.room-description {
+    color: var(--text-light);
+    margin-bottom: auto;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.room-details {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.room-capacity {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.capacity-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    display: block;
+}
+
+/* Profile Page */
+.profile-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary);
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    border: 3px solid var(--primary-light);
+}
+
+.profile-name {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.profile-email {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 1.1rem;
+}
+
+.info-value {
+    font-weight: 500;
+    color: var(--text-light);
+    font-family: monospace;
+    font-size: 1rem;
+}
+
+.btn-danger {
+    background-color: #EF4444;
+}
+
+.btn-danger:hover {
+    background-color: #DC2626;
+}
+
+.btn-group {
+    margin-top: 2rem;
+}
+
+/* Reservations Page */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Reservas Page */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    align-items: start;
+}
+
+.reservation-form {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: white;
+    transition: border-color 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.sala-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: var(--primary-light);
+    border-radius: var(--radius);
+}
+
+.sala-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+}
+
+.my-reservations-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 900px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.reservations-sidebar {
+    position: sticky;
+    top: 2rem;
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary);
+}
+
+.reserva-item {
+    background-color: var(--primary-light);
+    border-left: 4px solid var(--primary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: transform 0.2s;
+}
+
+.reserva-item:hover {
+    transform: translateX(4px);
+}
+
+.reserva-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 0.5rem;
+}
+
+.reserva-item-sala {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.reserva-item-estado {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.reserva-item-info {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.25rem;
+}
+
+.reserva-item-tiempo {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.reserva-item-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(0, 102, 255, 0.2);
+}
+
+.mi-reserva {
+    background-color: #E6F0FF;
+    border-left-color: #0066FF;
+}
+
+.mi-reserva-badge {
+    display: inline-block;
+    background-color: #0066FF;
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.activa {
+    background-color: #D1FAE5;
+    color: #059669;
+}
+
+.finalizada {
+    background-color: #F3F4F6;
+    color: #6B7280;
+}
+
+.no-reservas {
+    text-align: center;
+    padding: 2rem 0;
+    color: var(--text-light);
+}
+
+.no-reservas-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.btn-eliminar-reserva {
+    background-color: #EF4444;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.btn-eliminar-reserva:hover {
+    background-color: #DC2626;
+}
+
+/* Popups and Modals */
+.success-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    z-index: 1000;
+    animation: popupIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+}
+
+.popup-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.popup-message {
+    color: var(--text-light);
+}
+
+.success-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #D1FAE5;
+    color: #059669;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin: 0 auto 1rem;
+}
+
+.message {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+}
+
+.message-error {
+    background-color: #FEE2E2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+}
+
+.message-success {
+    background-color: #D1FAE5;
+    color: #059669;
+    border: 1px solid #A7F3D0;
+}
+
+.message-warning {
+    background-color: #FEF3C7;
+    color: #D97706;
+    border: 1px solid #FDE68A;
+}
+
+.message-info {
+    background-color: #DBEAFE;
+    color: #2563EB;
+    border: 1px solid #BFDBFE;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-light);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.salas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.sala-modal-card {
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sala-modal-card:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.sala-modal-card.selected {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.sala-modal-name {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.sala-modal-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    float: right;
+}
+
+.sala-modal-badge.ocupada {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
+.sala-modal-badge.disponible {
+    background-color: #D1FAE5;
+    color: #059669;
+}
+
+.sala-modal-description {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.sala-modal-capacity {
+    font-size: 0.8rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* Animations */
+@keyframes popupIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -40%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* About Page */
+.main-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    text-align: center;
+    margin-bottom: 3rem;
+    font-weight: normal;
+}
+
+.content-text {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+}
+
+.divider {
+    height: 1px;
+    background-color: var(--border);
+    margin: 2.5rem 0;
+    position: relative;
+}
+
+.subsection-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 2rem 0 1rem 0;
+}
+
+.contact-section {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.contact-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+}
+
+.contact-item {
+    margin-bottom: 1.5rem;
+}
+
+.contact-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.contact-value {
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+/* Login/Register Pages */
+.login-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
+    margin: 0 auto;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-subtitle {
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+.login-card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+}
+
+.btn-google {
+    background-color: #FFFFFF;
+    color: var(--text);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.btn-google:hover {
+    background-color: var(--background);
+}
+
+.divider-text {
+    text-align: center;
+    margin: 1.5rem 0;
+    color: var(--text-light);
+    position: relative;
+}
+
+.divider-text::before,
+.divider-text::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background-color: var(--border);
+}
+
+.divider-text::before {
+    left: 0;
+}
+
+.divider-text::after {
+    right: 0;
+}
+
+.links {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.link {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    background-color: #FEE2E2;
+    color: #DC2626;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.back-link {
+    display: inline-block;
+    color: var(--primary);
+    text-decoration: none;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Register Page */
+.register-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.register-subtitle {
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+.register-card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+}
+
+.password-requirements {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+.success-message {
+    background-color: #D1FAE5;
+    color: #059669;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: none;
+}
+
+/* Forgot Password Page */
+.recovery-container {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.recovery-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.recovery-subtitle {
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+.recovery-card {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+}
+
+.recovery-icon {
+    text-align: center;
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    color: #F59E0B;
+}
+
+.recovery-icon svg {
+    width: 80px;
+    height: 80px;
+}
+
+.recovery-description {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.info-message {
+    background-color: #DBEAFE;
+    color: #1E40AF;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-light);
+}
+
+.success-state {
+    text-align: center;
+}
+
+.success-state .recovery-icon {
+    color: #059669;
+}
+
+.success-state h3 {
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.success-state p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+/* Admin Panel */
+.admin-badge {
+    background-color: var(--danger);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.admin-panel {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.admin-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.admin-subtitle {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.form-section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.salas-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.sala-card {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.sala-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.sala-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.sala-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.sala-tipo {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.sala-description {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.sala-details {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.sala-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.access-denied {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.access-denied-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.access-denied h2 {
+    font-size: 2rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+}
+
+.access-denied p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+/* Disponibilidad Page */
+.filters {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.filter-input {
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.availability-table {
+    background-color: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.table-header {
+    background-color: var(--primary-light);
+    padding: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
+    gap: 1rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.table-row {
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
+    gap: 1rem;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.3s;
+}
+
+.table-row:hover {
+    background-color: var(--primary-light);
+}
+
+.table-row:last-child {
+    border-bottom: none;
+}
+
+.sala-name {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-badge.disponible {
+    background-color: #D1FAE5;
+    color: #059669;
+}
+
+.status-badge.ocupada {
+    background-color: #FEE2E2;
+    color: #DC2626;
+}
+
+.reserva-info {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.horarios-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.horario-badge {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 1024px) {
+
+    .table-header,
+    .table-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .table-header {
+        display: none;
+    }
+
+    .table-row::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text);
+    }
+}
+
+/* Footer */
+.footer {
+    background-color: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 2rem 0;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-logo {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.footer-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.footer-link {
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.footer-link:hover {
+    color: var(--primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}

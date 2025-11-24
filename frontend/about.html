@@ -1,269 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookey - About us</title>
-    <style>
-        :root {
-            --primary: #0066FF;
-            --primary-light: #E6F0FF;
-            --background: #F5F6FA;
-            --card: #FFFFFF;
-            --text: #1E1E1E;
-            --text-light: #6B7280;
-            --border: #E5E7EB;
-            --accent: #F59E0B;
-            --radius: 12px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            background-color: var(--background);
-            color: var(--text);
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .logo:hover {
-            opacity: 0.8;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .nav-link {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .nav-link:hover {
-            color: var(--primary);
-        }
-
-        .nav-link.active {
-            color: var(--primary);
-        }
-
-        /* Main Content */
-        .main-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--text);
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            text-align: center;
-            margin-bottom: 3rem;
-            font-weight: normal;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--text);
-            margin: 2.5rem 0 1rem 0;
-        }
-
-        .content-text {
-            color: var(--text-light);
-            margin-bottom: 1.5rem;
-            line-height: 1.7;
-        }
-
-        .divider {
-            height: 1px;
-            background-color: var(--border);
-            margin: 2.5rem 0;
-        }
-
-        .subsection-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text);
-            margin: 2rem 0 1rem 0;
-        }
-
-        /* Contact Section */
-        .contact-section {
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .contact-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--text);
-            margin-bottom: 1.5rem;
-        }
-
-        .contact-item {
-            margin-bottom: 1.5rem;
-        }
-
-        .contact-label {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .contact-value {
-            color: var(--text-light);
-            font-size: 1rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 1rem;
-            }
-            
-            .main-title {
-                font-size: 2rem;
-            }
-            
-            .nav-link {
-                font-size: 0.9rem;
-            }
-        }
-    </style>
+    <title>Bookey - About Us</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/about.css">
 </head>
+
 <body>
-    <!-- Header -->
-    <div class="header">
-        <a href="/" class="logo">Bookey</a>
-        <div class="nav-links">
-            <a href="/" class="nav-link">Principal</a>
-            <a href="/rooms" class="nav-link">Salas</a>
-            <a href="/profile" class="nav-link" id="profileLink" style="display: none;">Perfil</a>
-            <a href="/about" class="nav-link active">About us</a>
-            <div id="userInfo"></div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="/" class="logo">Bookey</a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Principal</a>
+                <a href="/rooms" class="nav-link">Salas</a>
+                <a href="/profile" class="nav-link" id="profileLink" style="display: none;">Perfil</a>
+                <a href="/about" class="nav-link active">About us</a>
+                <div id="userInfo"></div>
+            </div>
         </div>
-    </div>
 
-    <!-- Main Content -->
-    <h1 class="main-title">SOBRE NOSOTROS</h1>
-    <p class="subtitle">Transformando espacios en oportunidades de crecimiento y colaboración</p>
+        <!-- Main Content -->
+        <main class="main-container">
+        <section class="intro-section">
+            <h1 class="main-title">SOBRE NOSOTROS</h1>
+            <p class="subtitle">Transformando espacios en oportunidades de crecimiento y colaboración</p>
+        </section>
 
-    <h2 class="section-title">Nuestra Historia</h2>
-    <p class="content-text">
-        Bookey nació de una visión clara: crear espacios que inspiren el aprendizaje, fomenten la colaboración y potencien el desarrollo académico y profesional. Desde nuestros inicios, hemos trabajado incansablemente para diseñar ambientes que no solo cumplan con las necesidades funcionales, sino que también generen experiencias memorables.
-    </p>
-    
-    <p class="content-text">
-        Cada sala que ofrecemos ha sido cuidadosamente planificada para equilibrar comodidad, tecnología y funcionalidad. Creemos que el entorno físico juega un papel fundamental en la calidad de las interacciones humanas, y por eso nos esforzamos en proporcionar espacios que eleve cada sesión de trabajo, mentoría o estudio.
-    </p>
-    
-    <p class="content-text">
-        Hoy, somos más que un servicio de reserva de salas. Somos una comunidad comprometida con el crecimiento de estudiantes, profesionales y equipos que buscan un lugar donde sus ideas puedan florecer y convertirse en realidad.
-    </p>
+        <section class="content-section">
+            <h2 class="subsection-title">Nuestra Historia</h2>
+            <p class="content-text">
+                Bookey nació con una visión clara: crear espacios que inspiren el aprendizaje, fomenten la colaboración y potencien 
+                el desarrollo académico y profesional. Desde nuestros inicios, nos hemos dedicado a diseñar ambientes pensados no solo 
+                para cumplir funciones, sino para generar experiencias memorables.
+            </p>
+            <p class="content-text">
+                Cada sala que ofrecemos está cuidadosamente planificada para equilibrar comodidad, tecnología y funcionalidad. Creemos 
+                firmemente que el entorno físico es fundamental para la calidad de las interacciones humanas, por lo que nos esforzamos 
+                por ofrecer espacios que eleven cada sesión de trabajo, mentoría o estudio.
+            </p>
+            <p class="content-text">
+                Hoy, Bookey es más que un servicio de reserva de salas: es una comunidad comprometida con el crecimiento de estudiantes, 
+                profesionales y equipos que buscan un lugar donde sus ideas puedan florecer.
+            </p>
+        </section>
 
-    <div class="divider"></div>
+        <section class="mission-section">
+            <h2 class="subsection-title">Nuestra Misión</h2>
+            <p class="content-text">
+                Facilitar espacios de calidad que promuevan el aprendizaje colaborativo y el desarrollo de proyectos innovadores en un 
+                ambiente profesional y acogedor.
+            </p>
+        </section>
 
-    <h3 class="subsection-title">Nuestra Misión</h3>
-    <p class="content-text">
-        Facilitar espacios de calidad que impulsen el aprendizaje colaborativo y el desarrollo de proyectos innovadores en un ambiente profesional y acogedor.
-    </p>
+        <section class="team-section">
+            <h2 class="subsection-title">Nuestro Equipo</h2>
+            <p class="content-text">
+                Somos un equipo multidisciplinario dedicado a garantizar que cada detalle sea considerado desde la edición actual.
+            </p>
+        </section>
 
-    <h3 class="subsection-title">Nuestro Equipo</h3>
-    <p class="content-text">
-        Un grupo multidisciplinario dedicado a garantizar que cada detalle de él puede ser considerada desde la presente edición.
-    </p>
+        <section class="values-section">
+            <h2 class="subsection-title">Nuestros Valores</h2>
+            <p class="content-text">
+                Compromiso con la excelencia, respeto hacia cada usuario, innovación constante y pasión por crear experiencias que 
+                marquen la diferencia.
+            </p>
+        </section>
 
-    <h3 class="subsection-title">Nuestros Valores</h3>
-    <p class="content-text">
-        Compromiso con la excelencia, respeto por cada usuario, innovación constante y pasión por crear experiencias que marquen la diferencia.
-    </p>
+        <section class="commit-section">
+            <h2 class="subsection-title">Nuestro Compromiso</h2>
+        </section>
 
-    <h3 class="subsection-title">Nuestro Compromiso</h3>
-    <p class="content-text">
-        Mejorar continuamente nuestros servicios, escuchar a nuestra identidad, relacionarse con personas de nuestro uso personal.
-    </p>
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <h2 class="contact-title">Contáctanos</h2>
 
-    <!-- Contact Section -->
-    <div class="contact-section">
-        <h2 class="contact-title">Contáctanos</h2>
-        
-        <div class="contact-item">
-            <span class="contact-label">Email</span>
-            <div class="contact-value">info@bookey.com</div>
-        </div>
-        
-        <div class="contact-item">
-            <span class="contact-label">Teléfono</span>
-            <div class="contact-value">+52 (55) 1234-5678</div>
-        </div>
-        
-        <div class="contact-item">
-            <span class="contact-label">Horario</span>
-            <div class="contact-value">Lunes a Viernes: 7:00 AM - 10:00 PM</div>
-        </div>
+            <div class="contact-item">
+                <span class="contact-label">Email</span>
+                <div class="contact-value">info@bookey.com</div>
+            </div>
+
+            <div class="contact-item">
+                <span class="contact-label">Teléfono</span>
+                <div class="contact-value">+52 (55) 1234-5678</div>
+            </div>
+
+            <div class="contact-item">
+                <span class="contact-label">Horario</span>
+                <div class="contact-value">Lunes a Viernes: 7:00 AM - 10:00 PM</div>
+            </div>
+        </section>
+    </main>
     </div>
 
     <!-- Include Auth Script -->
     <script src="/js/auth.js"></script>
-    
+
     <script>
-        // Simple navigation highlighting
+        // Highlight active link
         document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
+            link.addEventListener('click', function () {
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
             });
         });
 
-        // Check authentication status on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        // Update UI if authenticated
+        document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                if (window.auth) {
-                    window.auth.updateUI();
-                }
-            }, 1000);
+                if (window.auth) window.auth.updateUI();
+            }, 500);
         });
     </script>
 </body>
+
 </html>

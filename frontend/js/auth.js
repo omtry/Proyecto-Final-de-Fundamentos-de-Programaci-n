@@ -297,10 +297,10 @@ function updateUI() {
     if (isAuthenticated && currentUser) {
         if (userInfo) {
             userInfo.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span>Hola, ${currentUser.displayName || currentUser.email.split('@')[0]}</span>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="color: var(--text-light);">Hola, ${currentUser.displayName || currentUser.email.split('@')[0]}</span>
                     <button onclick="window.auth.logout()" 
-                            style="background-color: #EF4444; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 0.8rem; cursor: pointer;">
+                            style="background-color: #EF4444; color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
                         Cerrar Sesión
                     </button>
                 </div>
@@ -373,7 +373,8 @@ window.auth = {
     updateUI,
     checkAuthForReservation,
     checkAuthForProfile,
-    notifyAuthChange
+    notifyAuthChange,
+    getDb: () => db // Exponer db para uso en admin
 };
 
 // Inicializar cuando se carga la página

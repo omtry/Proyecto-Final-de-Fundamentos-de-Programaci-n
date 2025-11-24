@@ -1,6 +1,8 @@
 // API Client para conectar con el backend
 // Configuración de la API
-const API_BASE_URL = window.location.origin + '/api';
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? (window.location.port === '3001' ? '/api' : 'http://localhost:3001/api')
+    : '/api';
 
 // Clase para manejar las llamadas a la API
 class ApiClient {
@@ -82,10 +84,7 @@ class ApiClient {
         return await this.request('/reservas');
     }
 
-    // Obtener todas las reservas (de todos los usuarios)
-    async getTodasLasReservas() {
-        return await this.request('/reservas');
-    }
+
 
     // Actualizar reserva
     async actualizarReserva(id, datos) {
@@ -107,12 +106,7 @@ class ApiClient {
         return await this.eliminarReserva(id);
     }
 
-    // Cancelar reserva
-    async cancelarReserva(id) {
-        return await this.request(`/reservas/${id}`, {
-            method: 'DELETE'
-        });
-    }
+
 
     // ==================== USUARIOS ====================
 
@@ -935,7 +929,7 @@ async function verificarRolAdmin(userId) {
 // Cargar todas las reservas (de todos los usuarios)
 async function loadTodasLasReservas() {
     try {
-        const response = await window.api.getTodasLasReservas();
+        const response = await window.api.getReservas();
         if (response.success) {
             return response.data;
         } else {

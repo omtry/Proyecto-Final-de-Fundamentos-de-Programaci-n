@@ -1,0 +1,111 @@
+/* About Page Styles - Clean and Minimalist */
+
+.main-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.intro-section {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.main-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--text);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    margin-bottom: 3rem;
+    font-weight: normal;
+}
+
+.subsection-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 2rem 0 1rem 0;
+    text-align: left;
+}
+
+.content-section,
+.mission-section,
+.team-section,
+.values-section,
+.commit-section {
+    margin-bottom: 2rem;
+    background: transparent;
+}
+
+.content-text {
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+    text-align: left;
+    font-size: 1rem;
+}
+
+/* Contact Section */
+.contact-section {
+    margin-top: 4rem;
+    padding: 3rem 2rem;
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.contact-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.contact-item {
+    margin-bottom: 1.8rem;
+}
+
+.contact-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.contact-value {
+    font-size: 1.05rem;
+    color: var(--text-light);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 1rem;
+    }
+
+    .main-title {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .subsection-title {
+        font-size: 1.1rem;
+    }
+
+    .content-text {
+        font-size: 0.95rem;
+    }
+}
