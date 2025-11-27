@@ -1,252 +1,196 @@
+require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
+const mongoose = require('mongoose');
+const Reserva = require('./models/Reserva');
+
 const app = express();
+
+// ==================== CONFIGURACIÓN ====================
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Mentorias';
 const PORT = process.env.PORT || 3001;
 
+// ==================== CONEXIÓN A MONGODB ====================
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log('✅ Conectado a MongoDB'))
+  .catch(err => console.error('❌ Error al conectar MongoDB:', err));
+
+// ==================== MIDDLEWARES ====================
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ==================== API ENDPOINTS (DEBEN IR ANTES DE STATIC) ====================
+// Archivos estáticos
+app.use(express.static(path.join(__dirname, 'frontend')));
+app.use('/js', express.static(path.join(__dirname, 'frontend', 'js')));
 
-// Base de datos simulada (en producción usarías una base de datos real)
-let salas = [
+// Helper para servir páginas del frontend
+const servePage = (filename) => (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', filename), (err) => {
+    if (err) {
+      console.error(`Error serving ${filename}:`, err);
+      res.status(500).send('Error loading page');
+    }
+  });
+};
+
+// ==================== RUTAS FRONTEND ====================
+app.get('/', servePage('index.html'));
+app.get('/about', servePage('about.html'));
+app.get('/rooms', servePage('rooms.html'));
+app.get('/profile', servePage('profile.html'));
+app.get('/register', servePage('register.html'));
+app.get('/login', servePage('login.html'));
+app.get('/room-details', servePage('detalles_salas.html'));
+app.get('/reservations', servePage('reservas.html'));
+app.get('/auth/google/callback', servePage(path.join('auth', 'google', 'callback.html')));
+
+// ==================== SALAS (CATÁLOGO) ====================
+const salas = [
   {
     id: 1,
     nombre: 'Sala 201',
-    tipo: 'Corporate',
-    descripcion: 'Sala ideal para sesiones de estrategia empresarial y planificación. Equipada con pizarra digital y herramientas de visualización avanzadas.',
-    capacidad: 6,
-    imagen: '/img/sala-204.jpeg',
+    tipo: 'Focus',
+    descripcion: 'Sala para mentorías uno a uno y trabajo concentrado.',
+    capacidad: 4,
+    imagen: '/img/201.jpeg',
     disponible: true,
-    equipamiento: ['Pizarra digital', 'Proyector', 'Sistema de audio', 'WiFi']
+    equipamiento: ['Pizarra blanca', 'WiFi']
   },
   {
     id: 2,
     nombre: 'Sala 202',
-    tipo: 'Cognata',
-    descripcion: 'Espacio dedicado a mentoría financiera y gestión de inversiones. Perfecta para análisis de mercado y planificación económica.',
+    tipo: 'Team',
+    descripcion: 'Sala para trabajo en equipo y pequeñas reuniones.',
     capacidad: 6,
-    imagen: 'https://images.unsplash.com/photo-1568992688065-536aad8a12f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+    imagen: '/img/202.jpeg',
     disponible: true,
-    equipamiento: ['Pantallas LED', 'Sistema de videoconferencia', 'WiFi', 'Aire acondicionado']
+    equipamiento: ['Pantalla', 'Pizarra', 'WiFi']
   },
   {
     id: 3,
     nombre: 'Sala 203',
-    tipo: 'Importe',
-    descripcion: 'Sala de resolución de problemas y pensamiento creativo. Ideal para sesiones de innovación y desarrollo de soluciones.',
+    tipo: 'Think',
+    descripcion: 'Sala para sesiones de ideas y resolución de problemas.',
     capacidad: 6,
     imagen: '/img/sala-203.jpeg',
     disponible: true,
-    equipamiento: ['Pizarra blanca', 'Marcadores', 'WiFi', 'Mesa colaborativa']
+    equipamiento: ['Pizarra', 'WiFi', 'Mesa colaborativa']
   },
   {
     id: 4,
     nombre: 'Sala 204',
-    tipo: 'Cognata',
-    descripcion: 'Espacio tecnológico para mentoría en programación y desarrollo de software. Equipada con estaciones de trabajo especializadas.',
+    tipo: 'Tech',
+    descripcion: 'Sala con PCs para mentorías de programación.',
     capacidad: 6,
     imagen: '/img/sala-204.jpeg',
     disponible: true,
-    equipamiento: ['Computadoras', 'Monitores duales', 'WiFi', 'Software especializado']
+    equipamiento: ['Computadoras', 'Monitores', 'WiFi']
   },
   {
     id: 5,
     nombre: 'Sala 205',
     tipo: 'Corporate',
-    descripcion: 'Sala multimedia para presentaciones ejecutivas y reuniones de alto nivel. Equipada con sistema de videoconferencia profesional.',
+    descripcion: 'Sala para presentaciones y videoconferencias.',
     capacidad: 6,
     imagen: '/img/sala-205.jpeg',
     disponible: true,
-    equipamiento: ['Sistema de videoconferencia', 'Proyector 4K', 'Audio profesional', 'WiFi']
+    equipamiento: ['Proyector', 'Audio', 'WiFi']
   },
   {
     id: 6,
     nombre: 'Sala 206',
     tipo: 'Innovate',
-    descripcion: 'Espacio colaborativo para sesiones de design thinking y prototipado rápido. Ideal para equipos multidisciplinarios.',
+    descripcion: 'Sala creativa para diseño y proyectos.',
     capacidad: 6,
     imagen: '/img/sala-206.jpeg',
     disponible: true,
-    equipamiento: ['Pizarra digital', 'Materiales de prototipado', 'WiFi', 'Espacio flexible']
+    equipamiento: ['Pizarras', 'WiFi']
   },
   {
     id: 7,
     nombre: 'Sala 207',
-    tipo: 'Focus',
-    descripcion: 'Sala silenciosa para mentorías individuales y sesiones de concentración profunda. Aislamiento acústico premium.',
-    capacidad: 6,
+    tipo: 'Lab',
+    descripcion: 'Sala tipo laboratorio para pruebas técnicas.',
+    capacidad: 4,
     imagen: '/img/sala-207.jpeg',
     disponible: true,
-    equipamiento: ['Aislamiento acústico', 'Iluminación ajustable', 'WiFi', 'Mesa individual']
+    equipamiento: ['Mesas', 'WiFi']
   }
 ];
 
-// Archivos de persistencia
-const RESERVAS_FILE = path.join(__dirname, 'data', 'reservas.json');
-const USUARIOS_FILE = path.join(__dirname, 'data', 'usuarios.json');
+// ==================== HELPERS DE RESERVAS ====================
 
-// Crear directorio data si no existe
-if (!fs.existsSync(path.join(__dirname, 'data'))) {
-  fs.mkdirSync(path.join(__dirname, 'data'));
+// Calcula la hora de fin dado un horario "HH:MM" y duración en horas
+function calcularHoraFin(horario, duracionHoras) {
+  const [h, m] = horario.split(':').map(Number);
+  const total = h * 60 + m + Number(duracionHoras) * 60;
+  const hh = String(Math.floor(total / 60)).padStart(2, '0');
+  const mm = String(total % 60).padStart(2, '0');
+  return `${hh}:${mm}`;
 }
 
-// Función para cargar reservas desde archivo
-function cargarReservas() {
-  try {
-    if (fs.existsSync(RESERVAS_FILE)) {
-      const data = fs.readFileSync(RESERVAS_FILE, 'utf8');
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error('Error al cargar reservas:', error);
-  }
-  return [];
-}
-
-// Función para guardar reservas en archivo
-function guardarReservas(reservas) {
-  try {
-    fs.writeFileSync(RESERVAS_FILE, JSON.stringify(reservas, null, 2), 'utf8');
-  } catch (error) {
-    console.error('Error al guardar reservas:', error);
-  }
-}
-
-// Función para cargar usuarios desde archivo
-function cargarUsuarios() {
-  try {
-    if (fs.existsSync(USUARIOS_FILE)) {
-      const data = fs.readFileSync(USUARIOS_FILE, 'utf8');
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error('Error al cargar usuarios:', error);
-  }
-  return [];
-}
-
-// Función para guardar usuarios en archivo
-function guardarUsuarios(usuarios) {
-  try {
-    fs.writeFileSync(USUARIOS_FILE, JSON.stringify(usuarios, null, 2), 'utf8');
-  } catch (error) {
-    console.error('Error al guardar usuarios:', error);
-  }
-}
-
-let reservas = cargarReservas();
-let usuarios = cargarUsuarios();
-
-// ==================== FUNCIONES HELPER ====================
-
-// Función para calcular hora de fin de una reserva
-function calcularHoraFin(horario, duracion) {
-  const [hora, minuto] = horario.split(':').map(Number);
-  // Convertir duración a minutos para manejar duraciones decimales (ej: 1.5 horas = 90 minutos)
-  const duracionMinutos = duracion * 60;
-  const totalMinutos = (hora * 60) + minuto + duracionMinutos;
-  const horaFin = Math.floor(totalMinutos / 60);
-  const minutoFin = totalMinutos % 60;
-  return `${horaFin.toString().padStart(2, '0')}:${minutoFin.toString().padStart(2, '0')}`;
-}
-
-// Función para verificar si una reserva está activa
+// Determina si una reserva está activa en este momento
 function esReservaActiva(reserva) {
   const ahora = new Date();
-  const fechaActual = ahora.toISOString().split('T')[0]; // YYYY-MM-DD
-  const horaActual = ahora.toTimeString().split(' ')[0].substring(0, 5); // HH:MM
+  const fechaActual = ahora.toISOString().split('T')[0];
+  const horaActual = ahora.toTimeString().slice(0, 5); // "HH:MM"
 
-  // Si la fecha de la reserva es pasada, no está activa
-  if (reserva.fecha < fechaActual) {
-    return false;
-  }
+  if (reserva.fecha !== fechaActual || reserva.estado !== 'confirmada') return false;
 
-  // Si la fecha es futura, está activa
-  if (reserva.fecha > fechaActual) {
-    return true;
-  }
-
-  // Si la fecha es hoy, verificar si la hora actual es menor a la hora de fin
-  if (reserva.fecha === fechaActual) {
-    // Calcular hora de fin correctamente
-    let horaFin = reserva.horaFin;
-    // Si horaFin no existe o tiene formato incorrecto, calcularla
-    if (!horaFin || !/^\d{2}:\d{2}$/.test(horaFin)) {
-      horaFin = calcularHoraFin(reserva.horario, reserva.duracion);
-    }
-
-    // Comparar horas en formato HH:MM
-    const [horaAct, minAct] = horaActual.split(':').map(Number);
-    const [horaFinNum, minFin] = horaFin.split(':').map(Number);
-
-    const minutosActuales = horaAct * 60 + minAct;
-    const minutosFin = horaFinNum * 60 + minFin;
-
-    return minutosActuales < minutosFin;
-  }
-
-  return false;
+  const horaFin = reserva.horaFin || calcularHoraFin(reserva.horario, reserva.duracion);
+  return horaActual >= reserva.horario && horaActual < horaFin;
 }
 
-// Función para verificar si un usuario es admin
-// Por ahora, verificamos si el userId está en una lista de admins
-// En producción, esto debería consultar Firestore
-async function isAdmin(userId) {
-  // Lista temporal de admins (en producción consultar Firestore)
-  // Por ahora, cualquier usuario puede ser admin si se especifica en el request
-  // TODO: Implementar consulta a Firestore para verificar rol
-  return false; // Por defecto no es admin, se verificará desde el frontend
+// Reservas activas de un usuario (usa Mongo)
+async function getReservasActivasUsuario(userId) {
+  const reservas = await Reserva.find({
+    userId,
+    estado: 'confirmada'
+  }).lean();
+
+  return reservas.filter(r => esReservaActiva(r));
 }
 
-// Función para obtener reservas activas de un usuario
-function getReservasActivasUsuario(userId) {
-  return reservas.filter(r =>
-    r.userId === userId &&
-    r.estado === 'confirmada' &&
-    esReservaActiva(r)
-  );
-}
-
-// Función para verificar conflictos de horario en una sala
-function tieneConflictoHorario(salaId, fecha, horario, duracion, excluirReservaId = null) {
+// Verifica si hay conflicto de horario en una sala
+async function tieneConflictoHorario({ salaId, fecha, horario, duracion, excluirReservaId = null }) {
   const horaFin = calcularHoraFin(horario, duracion);
 
-  return reservas.some(r => {
-    // Excluir la reserva que estamos actualizando
-    if (excluirReservaId && r.id === excluirReservaId) {
-      return false;
-    }
+  const query = {
+    salaId,
+    fecha,
+    estado: 'confirmada'
+  };
 
-    // Solo verificar reservas confirmadas de la misma sala y fecha
-    if (r.salaId === salaId &&
-      r.fecha === fecha &&
-      r.estado === 'confirmada') {
-      const rHoraFin = r.horaFin || calcularHoraFin(r.horario, r.duracion);
+  if (excluirReservaId) {
+    query.id = { $ne: excluirReservaId };
+  }
 
-      // Verificar si hay solapamiento de horarios
-      return (horario >= r.horario && horario < rHoraFin) ||
-        (horaFin > r.horario && horaFin <= rHoraFin) ||
-        (horario <= r.horario && horaFin >= rHoraFin);
-    }
+  const reservasSala = await Reserva.find(query).lean();
 
-    return false;
+  return reservasSala.some(r => {
+    const rHoraFin = r.horaFin || calcularHoraFin(r.horario, r.duracion);
+
+    return (
+      (horario >= r.horario && horario < rHoraFin) ||  // inicio dentro
+      (horaFin > r.horario && horaFin <= rHoraFin) ||  // fin dentro
+      (horario <= r.horario && horaFin >= rHoraFin)    // solapa totalmente
+    );
   });
 }
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    message: 'API Server is running',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0'
-  });
+// ==================== RUTAS API ====================
+
+// Test simple
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Server is working!', timestamp: new Date() });
 });
 
-// Obtener todas las salas
+// ==================== SALAS ====================
+
+// GET /api/salas  -> lista todas las salas
 app.get('/api/salas', (req, res) => {
   try {
     res.json({
@@ -263,7 +207,7 @@ app.get('/api/salas', (req, res) => {
   }
 });
 
-// Obtener sala por ID
+// GET /api/salas/:id  -> sala por ID
 app.get('/api/salas/:id', (req, res) => {
   try {
     const salaId = parseInt(req.params.id);
@@ -289,11 +233,14 @@ app.get('/api/salas/:id', (req, res) => {
   }
 });
 
-// Obtener horarios disponibles
+
+// ==================== HORARIOS ====================
+
 app.get('/api/horarios', (req, res) => {
   try {
+    // Reservas desde las 8:00 hasta las 17:00 (5 PM)
     const horarios = [
-      '07:00', '08:00', '09:00', '10:00', '11:00', '12:00',
+      '08:00', '09:00', '10:00', '11:00', '12:00',
       '13:00', '14:00', '15:00', '16:00', '17:00'
     ];
 
@@ -310,39 +257,80 @@ app.get('/api/horarios', (req, res) => {
   }
 });
 
-// Crear nueva reserva
-app.post('/api/reservas', (req, res) => {
-  try {
-    const { salaId, fecha, horario, duracion, proposito, participantes, notas, userId } = req.body;
 
-    if (!salaId || !fecha || !horario || !duracion || !proposito || !participantes || !userId) {
+// ==================== VALIDACIÓN DE HORARIO (YA EXISTENTE) ====================
+
+/**
+ * Validate booking end time.
+ * Request body: { startTime: "HH:mm", duration: number (hours) }
+ * The system allows reservations up to 16:00 (4 PM) inclusive.
+ */
+app.post('/api/validate-booking', (req, res) => {
+  try {
+    const { startTime, duration } = req.body;
+
+    if (!startTime || (duration === undefined || duration === null)) {
+      return res.status(400).json({
+        valid: false,
+        message: 'Hora de inicio y duración son requeridos',
+      });
+    }
+
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    if (Number.isNaN(startHour) || Number.isNaN(startMinute)) {
+      return res.status(400).json({
+        valid: false,
+        message: 'Formato de hora inválido. Use HH:mm',
+      });
+    }
+
+    const durationHours = parseFloat(duration);
+    if (Number.isNaN(durationHours) || durationHours <= 0) {
+      return res.status(400).json({
+        valid: false,
+        message: 'Duración inválida',
+      });
+    }
+
+    // Minutes based check to support fractional durations in hours
+    const startMinutesTotal = startHour * 60 + startMinute;
+    const endMinutesTotal = startMinutesTotal + Math.round(durationHours * 60);
+
+    // 🔹 Ahora permitimos reservas hasta las 18:00 (6 PM)
+    const lastAllowedMinutes = 18 * 60; // 18:00
+    if (endMinutesTotal > lastAllowedMinutes) {
+      return res.json({
+        valid: false,
+        message: 'La reserva excede el horario permitido. Solo puedes usar la sala hasta las 6:00 PM.'
+      });
+    }
+
+    return res.json({ valid: true });
+  } catch (error) {
+    console.error('Error validating booking:', error);
+    return res.status(500).json({
+      valid: false,
+      message: 'Error interno del servidor',
+    });
+  }
+});
+
+
+// ==================== RESERVAS ====================
+
+// Crear nueva reserva
+app.post('/api/reservas', async (req, res) => {
+  try {
+    const { salaId, fecha, horario, duracion, proposito, participantes, notas, userId, userName, userEmail } = req.body;
+
+    if (!salaId || !fecha || !horario || !duracion || !userId) {
       return res.status(400).json({
         success: false,
         message: 'Faltan campos requeridos'
       });
     }
 
-    // Verificar límite de reservas activas (máximo 2)
-    const reservasActivas = getReservasActivasUsuario(userId);
-    if (reservasActivas.length >= 2) {
-      return res.status(400).json({
-        success: false,
-        message: 'Ya tienes 2 reservas activas. Solo puedes tener un máximo de 2 reservas a la vez.',
-        reservasActivas: reservasActivas
-      });
-    }
-
-    // Verificar que no haya una reserva en la misma fecha
-    const reservaMismaFecha = reservasActivas.find(r => r.fecha === fecha);
-    if (reservaMismaFecha) {
-      return res.status(400).json({
-        success: false,
-        message: 'Ya tienes una reserva para esta fecha. Solo puedes tener una reserva por día.',
-        reservaExistente: reservaMismaFecha
-      });
-    }
-
-    const sala = salas.find(s => s.id === salaId);
+    const sala = salas.find(s => s.id === parseInt(salaId));
     if (!sala) {
       return res.status(404).json({
         success: false,
@@ -350,8 +338,24 @@ app.post('/api/reservas', (req, res) => {
       });
     }
 
-    // Verificar conflictos de horario
-    if (tieneConflictoHorario(salaId, fecha, horario, duracion)) {
+    // Limite de 2 reservas activas por usuario
+    const reservasActivas = await getReservasActivasUsuario(userId);
+    if (reservasActivas.length >= 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Ya tienes 2 reservas activas. Debes cancelar una antes de crear otra.'
+      });
+    }
+
+    // Verificar conflicto de horario
+    const hayConflicto = await tieneConflictoHorario({
+      salaId: parseInt(salaId),
+      fecha,
+      horario,
+      duracion: parseFloat(duracion)
+    });
+
+    if (hayConflicto) {
       return res.status(409).json({
         success: false,
         message: 'La sala ya está reservada en ese horario. Por favor, elige otro horario.'
@@ -361,31 +365,30 @@ app.post('/api/reservas', (req, res) => {
     // Calcular hora de fin
     const horaFin = calcularHoraFin(horario, duracion);
 
-    const nuevaReserva = {
-      id: Date.now(),
+    const nuevaReserva = await Reserva.create({
+      id: Date.now(), // ID numérico para el frontend
       userId,
-      salaId,
+      userName: userName || 'Usuario',
+      userEmail: userEmail || '',
+      salaId: parseInt(salaId),
       salaNombre: sala.nombre,
       fecha,
       horario,
       duracion: parseFloat(duracion),
-      horaFin, // Agregar hora de fin calculada
-      proposito,
-      participantes: parseInt(participantes),
+      horaFin,
+      proposito: proposito || 'Sesión de mentoría',
+      participantes: participantes ? parseInt(participantes) : 1,
       notas: notas || '',
       estado: 'confirmada',
-      fechaCreacion: new Date().toISOString()
-    };
+      fechaCreacion: new Date()
+    });
 
-    reservas.push(nuevaReserva);
-    guardarReservas(reservas); // Guardar en archivo después de crear
-
-    res.status(201).json({
+    res.json({
       success: true,
-      message: 'Reserva creada exitosamente',
       data: nuevaReserva
     });
   } catch (error) {
+    console.error('Error al crear reserva:', error);
     res.status(500).json({
       success: false,
       message: 'Error al crear la reserva',
@@ -394,53 +397,11 @@ app.post('/api/reservas', (req, res) => {
   }
 });
 
-// Obtener reservas de un usuario
-app.get('/api/reservas/:userId', (req, res) => {
-  try {
-    const { userId } = req.params;
-    const reservasUsuario = reservas.filter(r => r.userId === userId);
-
-    res.json({
-      success: true,
-      data: reservasUsuario,
-      total: reservasUsuario.length
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener las reservas',
-      error: error.message
-    });
-  }
-});
-
-// Obtener reservas activas de un usuario
-app.get('/api/reservas/usuario/:userId/activas', (req, res) => {
-  try {
-    const { userId } = req.params;
-    console.log(`[DEBUG] Getting active reservations for user: ${userId}`);
-
-    const reservasActivas = getReservasActivasUsuario(userId);
-    console.log(`[DEBUG] Found ${reservasActivas.length} active reservations`);
-
-    res.json({
-      success: true,
-      data: reservasActivas,
-      total: reservasActivas.length
-    });
-  } catch (error) {
-    console.error('[DEBUG] Error getting active reservations:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener las reservas activas',
-      error: error.message
-    });
-  }
-});
-
 // Obtener todas las reservas
-app.get('/api/reservas', (req, res) => {
+app.get('/api/reservas', async (req, res) => {
   try {
+    const reservas = await Reserva.find().sort({ fechaCreacion: -1 });
+
     res.json({
       success: true,
       data: reservas,
@@ -455,108 +416,152 @@ app.get('/api/reservas', (req, res) => {
   }
 });
 
-// Cancelar reserva
-app.delete('/api/reservas/:id', (req, res) => {
+// Reservas activas de un usuario (esta ruta debe ir ANTES de /api/reservas/:userId)
+app.get('/api/reservas/usuario/:userId/activas', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const reservasActivas = await getReservasActivasUsuario(userId);
+
+    res.json({
+      success: true,
+      data: reservasActivas,
+      total: reservasActivas.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener reservas activas',
+      error: error.message
+    });
+  }
+});
+
+// Obtener reservas de un usuario
+app.get('/api/reservas/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const reservasUsuario = await Reserva.find({ userId }).sort({ fechaCreacion: -1 });
+
+    res.json({
+      success: true,
+      data: reservasUsuario
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener las reservas del usuario',
+      error: error.message
+    });
+  }
+});
+
+// Actualizar reserva
+app.put('/api/reservas/:id', async (req, res) => {
   try {
     const reservaId = parseInt(req.params.id);
-    const reservaIndex = reservas.findIndex(r => r.id === reservaId);
+    const datos = req.body;
 
-    if (reservaIndex === -1) {
+    const reserva = await Reserva.findOne({ id: reservaId });
+    if (!reserva) {
       return res.status(404).json({
         success: false,
         message: 'Reserva no encontrada'
       });
     }
 
-    reservas.splice(reservaIndex, 1);
-    guardarReservas(reservas); // Guardar en archivo después de eliminar
+    // Si cambia horario/duración/fecha/sala, revisar conflictos
+    const salaId = datos.salaId || reserva.salaId;
+    const fecha = datos.fecha || reserva.fecha;
+    const horario = datos.horario || reserva.horario;
+    const duracion = datos.duracion || reserva.duracion;
+
+    const hayConflicto = await tieneConflictoHorario({
+      salaId,
+      fecha,
+      horario,
+      duracion,
+      excluirReservaId: reservaId
+    });
+
+    if (hayConflicto) {
+      return res.status(409).json({
+        success: false,
+        message: 'La sala ya está reservada en ese horario.'
+      });
+    }
+
+    if (datos.horario || datos.duracion) {
+      datos.horaFin = calcularHoraFin(horario, duracion);
+    }
+
+    const reservaActualizada = await Reserva.findOneAndUpdate(
+      { id: reservaId },
+      datos,
+      { new: true }
+    );
 
     res.json({
       success: true,
-      message: 'Reserva cancelada exitosamente'
+      data: reservaActualizada
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error al cancelar la reserva',
+      message: 'Error al actualizar la reserva',
       error: error.message
     });
   }
 });
 
-// Obtener perfil de usuario
-app.get('/api/usuarios/:id', (req, res) => {
+// Eliminar / cancelar reserva
+app.delete('/api/reservas/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const usuario = usuarios.find(u => u.id === id);
+    const reservaId = parseInt(req.params.id);
 
-    if (!usuario) {
+    const reservaEliminada = await Reserva.findOneAndDelete({ id: reservaId });
+
+    if (!reservaEliminada) {
       return res.status(404).json({
         success: false,
-        message: 'Usuario no encontrado'
+        message: 'Reserva no encontrada'
       });
     }
 
     res.json({
       success: true,
-      data: usuario
+      message: 'Reserva eliminada correctamente'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error al obtener el usuario',
+      message: 'Error al eliminar la reserva',
       error: error.message
     });
   }
 });
 
-// Obtener estadísticas
-app.get('/api/stats', (req, res) => {
-  try {
-    const stats = {
-      totalSalas: salas.length,
-      salasDisponibles: salas.filter(s => s.disponible).length,
-      totalReservas: reservas.length,
-      reservasConfirmadas: reservas.filter(r => r.estado === 'confirmada').length,
-      totalUsuarios: usuarios.length
-    };
+// ==================== DISPONIBILIDAD ====================
 
-    res.json({
-      success: true,
-      data: stats
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener estadísticas',
-      error: error.message
-    });
-  }
-});
-
-// Obtener disponibilidad de todas las salas
-app.get('/api/disponibilidad', (req, res) => {
+app.get('/api/disponibilidad', async (req, res) => {
   try {
-    const fecha = req.query.fecha || new Date().toISOString().split('T')[0]; // Fecha actual por defecto
+    const fecha = req.query.fecha || new Date().toISOString().split('T')[0];
+
+    const reservasFecha = await Reserva.find({
+      fecha,
+      estado: 'confirmada'
+    }).lean();
+
+    const ahora = new Date();
+    const fechaActual = ahora.toISOString().split('T')[0];
+    const horaActual = ahora.toTimeString().slice(0, 5);
 
     const disponibilidad = salas.map(sala => {
-      // Obtener reservas activas de esta sala para la fecha especificada
-      const reservasSala = reservas.filter(r =>
-        r.salaId === sala.id &&
-        r.fecha === fecha &&
-        r.estado === 'confirmada'
-      );
-
-      // Determinar si está ocupada ahora
-      const ahora = new Date();
-      const fechaActual = ahora.toISOString().split('T')[0];
-      const horaActual = ahora.toTimeString().split(' ')[0].substring(0, 5);
+      const reservasSala = reservasFecha.filter(r => r.salaId === sala.id);
 
       let ocupada = false;
       let reservaActual = null;
 
       if (fecha === fechaActual) {
-        // Si es hoy, verificar si hay una reserva activa ahora
         reservaActual = reservasSala.find(r => {
           const horaFin = r.horaFin || calcularHoraFin(r.horario, r.duracion);
           return horaActual >= r.horario && horaActual < horaFin;
@@ -564,10 +569,9 @@ app.get('/api/disponibilidad', (req, res) => {
         ocupada = !!reservaActual;
       }
 
-      // Próxima reserva
       const proximaReserva = reservasSala
         .filter(r => r.horario > (fecha === fechaActual ? horaActual : '00:00'))
-        .sort((a, b) => a.horario.localeCompare(b.horario))[0];
+        .sort((a, b) => a.horario.localeCompare(b.horario))[0] || null;
 
       return {
         sala: {
@@ -589,7 +593,7 @@ app.get('/api/disponibilidad', (req, res) => {
           horaFin: proximaReserva.horaFin || calcularHoraFin(proximaReserva.horario, proximaReserva.duracion),
           proposito: proximaReserva.proposito
         } : null,
-        reservasDelDia: reservasSala.length,
+        totalReservasHoy: reservasSala.length,
         horariosOcupados: reservasSala.map(r => ({
           inicio: r.horario,
           fin: r.horaFin || calcularHoraFin(r.horario, r.duracion)
@@ -605,27 +609,23 @@ app.get('/api/disponibilidad', (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error al obtener disponibilidad',
+      message: 'Error al obtener la disponibilidad',
       error: error.message
     });
   }
 });
 
-// Obtener información de usuario (incluyendo rol)
-app.get('/api/user/:userId', async (req, res) => {
+// ==================== USER BÁSICO (para verificarAdmin) ====================
+
+app.get('/api/user/:userId', (req, res) => {
   try {
     const { userId } = req.params;
-
-    // Por ahora retornamos información básica
-    // En producción, esto debería consultar Firestore
-    const usuario = usuarios.find(u => u.id === userId);
 
     res.json({
       success: true,
       data: {
         id: userId,
-        role: usuario?.role || 'user', // Por defecto es 'user'
-        ...usuario
+        role: 'user' // aquí luego puedes agregar lógica para admins
       }
     });
   } catch (error) {
@@ -637,300 +637,52 @@ app.get('/api/user/:userId', async (req, res) => {
   }
 });
 
-// ==================== ENDPOINTS DE ADMINISTRACIÓN ====================
+// ==================== STATS Y HEALTH (usados por el frontend) ====================
 
-// Crear nueva sala (solo admin)
-app.post('/api/admin/salas', async (req, res) => {
-  try {
-    const { userId, nombre, tipo, descripcion, capacidad, imagen, equipamiento } = req.body;
-
-    // Validar que se proporcione userId para verificar admin
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'Se requiere autenticación'
-      });
-    }
-
-    // Verificar que el usuario sea admin
-    // Por ahora, aceptamos el request si viene con userId
-    // En producción, verificar con isAdmin(userId)
-    const esAdminUser = await isAdmin(userId);
-    // Por ahora permitimos crear salas (se validará desde el frontend)
-
-    // Validar campos requeridos
-    if (!nombre || !tipo || !descripcion || !capacidad) {
-      return res.status(400).json({
-        success: false,
-        message: 'Faltan campos requeridos: nombre, tipo, descripcion, capacidad'
-      });
-    }
-
-    // Crear nueva sala
-    const nuevaSala = {
-      id: salas.length > 0 ? Math.max(...salas.map(s => s.id)) + 1 : 1,
-      nombre,
-      tipo,
-      descripcion,
-      capacidad: parseInt(capacidad),
-      imagen: imagen || 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3',
-      disponible: true,
-      equipamiento: equipamiento || ['WiFi', 'Proyector', 'Aire acondicionado']
-    };
-
-    salas.push(nuevaSala);
-
-    res.status(201).json({
-      success: true,
-      message: 'Sala creada exitosamente',
-      data: nuevaSala
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error al crear la sala',
-      error: error.message
-    });
-  }
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: new Date()
+  });
 });
 
-// Eliminar sala (solo admin)
-app.delete('/api/admin/salas/:id', async (req, res) => {
+app.get('/api/stats', async (req, res) => {
   try {
-    const { id } = req.params;
-    const { userId } = req.query; // userId desde query params
-
-    // Validar que se proporcione userId
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'Se requiere autenticación'
-      });
-    }
-
-    // Verificar que el usuario sea admin
-    const esAdminUser = await isAdmin(userId);
-    // Por ahora permitimos eliminar salas (se validará desde el frontend)
-
-    const salaId = parseInt(id);
-    const salaIndex = salas.findIndex(s => s.id === salaId);
-
-    if (salaIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        message: 'Sala no encontrada'
-      });
-    }
-
-    // Verificar que no tenga reservas activas
-    const reservasSala = reservas.filter(r =>
-      r.salaId === salaId &&
-      r.estado === 'confirmada' &&
-      esReservaActiva(r)
-    );
-
-    if (reservasSala.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No se puede eliminar la sala porque tiene reservas activas',
-        reservasActivas: reservasSala.length
-      });
-    }
-
-    // Eliminar la sala
-    salas.splice(salaIndex, 1);
+    const totalReservas = await Reserva.countDocuments();
+    const totalUsuarios = (await Reserva.distinct('userId')).length;
 
     res.json({
       success: true,
-      message: 'Sala eliminada exitosamente'
+      data: {
+        totalReservas,
+        totalUsuarios
+      }
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error al eliminar la sala',
+      message: 'Error al obtener estadísticas',
       error: error.message
     });
   }
 });
 
-// API test route
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Server is working!', timestamp: new Date() });
-});
+// ==================== 404 Y MANEJO DE ERRORES ====================
 
-// API route to validate booking time
-app.post('/api/validate-booking', (req, res) => {
-  try {
-    const { startTime, duration } = req.body;
-
-    if (!startTime || !duration) {
-      return res.status(400).json({
-        valid: false,
-        message: 'Hora de inicio y duración son requeridos'
-      });
-    }
-
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const durationHours = parseInt(duration);
-
-    // Calculate end time
-    const endHour = startHour + durationHours;
-
-    // Check if end time exceeds 6:00 PM (18:00)
-    if (endHour > 18) {
-      return res.json({
-        valid: false,
-        message: 'La reserva excede el horario permitido. Solo puedes reservar hasta las 6:00 PM.'
-      });
-    }
-
-    return res.json({ valid: true });
-  } catch (error) {
-    console.error('Error validating booking:', error);
-    return res.status(500).json({
-      valid: false,
-      message: 'Error interno del servidor'
-    });
-  }
-});
-
-// ==================== SERVIR ARCHIVOS ESTÁTICOS Y HTML ====================
-
-app.use(express.static('frontend'));
-
-// Serve HTML files with error handling
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'), (err) => {
-    if (err) {
-      console.error('Error serving index.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-app.get('/about', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'about.html'), (err) => {
-    if (err) {
-      console.error('Error serving about.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-app.get('/rooms', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'rooms.html'), (err) => {
-    if (err) {
-      console.error('Error serving rooms.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-app.get('/profile', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'profile.html'), (err) => {
-    if (err) {
-      console.error('Error serving profile.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-app.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'register.html'), (err) => {
-    if (err) {
-      console.error('Error serving register.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'login.html'), (err) => {
-    if (err) {
-      console.error('Error serving login.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-app.get('/forgot-password', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'forgot-password.html'), (err) => {
-    if (err) {
-      console.error('Error serving forgot-password.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'admin.html'), (err) => {
-    if (err) {
-      console.error('Error serving admin.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-app.get('/disponibilidad', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'disponibilidad.html'), (err) => {
-    if (err) {
-      console.error('Error serving disponibilidad.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-// Serve static files from frontend/js
-app.use('/js', express.static(path.join(__dirname, 'frontend', 'js')));
-
-// Serve static files from frontend/img
-app.use('/img', express.static(path.join(__dirname, 'frontend', 'img')));
-
-// NEW ROUTES - Add these
-// Redirigir /room-details a /rooms para mantener consistencia
-app.get('/room-details', (req, res) => {
-  res.redirect('/rooms');
-});
-
-app.get('/reservations', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'reservas.html'), (err) => {
-    if (err) {
-      console.error('Error serving reservas.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-// Google OAuth callback route
-app.get('/auth/google/callback', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'auth', 'google', 'callback.html'), (err) => {
-    if (err) {
-      console.error('Error serving callback.html:', err);
-      res.status(500).send('Error loading page');
-    }
-  });
-});
-
-// 404 handler - Devuelve JSON para rutas de API, HTML para páginas
+// 404 handler -> enviar index (SPA) o página principal
 app.use((req, res) => {
-  // Si es una ruta de API, devolver JSON
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({
-      success: false,
-      message: 'Endpoint no encontrado',
-      path: req.path
-    });
-  }
-  // Si no es API, devolver HTML
   res.status(404).sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-// Error handler
+// Error handler centralizado
 app.use((err, req, res, next) => {
   console.error('Server error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// ==================== INICIO DEL SERVIDOR ====================
 app.listen(PORT, () => {
   console.log(`🚀 BK Server running on http://localhost:${PORT}`);
   console.log(`🌐 Website routes:`);
@@ -940,7 +692,7 @@ app.listen(PORT, () => {
   console.log(`   Profile: http://localhost:${PORT}/profile`);
   console.log(`   Login: http://localhost:${PORT}/login`);
   console.log(`   Register: http://localhost:${PORT}/register`);
+  console.log(`   Room Details: http://localhost:${PORT}/room-details`);
   console.log(`   Reservations: http://localhost:${PORT}/reservations`);
   console.log(`📡 API Test: http://localhost:${PORT}/api/test`);
-  console.log(`💾 Datos cargados: ${reservas.length} reservas, ${usuarios.length} usuarios`);
 });

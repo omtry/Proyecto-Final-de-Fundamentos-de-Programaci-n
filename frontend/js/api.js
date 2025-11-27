@@ -959,3 +959,5 @@ window.loadDisponibilidad = loadDisponibilidad;
 window.loadReservasActivas = loadReservasActivas;
 window.verificarRolAdmin = verificarRolAdmin;
 window.displayReservasActivas = displayReservasActivas;
+window.loadReservasUsuario = loadReservasUsuario;
+

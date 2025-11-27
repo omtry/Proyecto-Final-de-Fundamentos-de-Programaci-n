@@ -494,13 +494,19 @@
             const sidebarContainer = document.getElementById('reservasSidebarContainer');
             if (!sidebarContainer) return;
 
+            // 🔹 Fallback: si no me mandan currentUserId, lo saco de auth
+            if (!currentUserId && window.auth && window.auth.getCurrentUser) {
+                const user = window.auth.getCurrentUser();
+                currentUserId = user?.uid;
+            }
+
             if (!reservas || reservas.length === 0) {
                 sidebarContainer.innerHTML = `
-                    <div class="no-reservas">
-                        <div class="no-reservas-icon">📅</div>
-                        <p>No hay reservas aún</p>
-                    </div>
-                `;
+            <div class="no-reservas">
+                <div class="no-reservas-icon">📅</div>
+                <p>No hay reservas aún</p>
+            </div>
+            `;
                 return;
             }
 
@@ -812,8 +818,11 @@
                     proposito: 'Sesión de mentoría',
                     participantes: 4,
                     notas: '',
-                    userId: currentUser.uid
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName || currentUser.email || 'Usuario',
+                    userEmail: currentUser.email || ''
                 };
+
 
                 // Validar horario
                 const validation = await window.api.validarHorario(reservaData.horario, reservaData.duracion);
@@ -825,10 +834,12 @@
                 // Crear reserva
                 const result = await window.api.crearReserva(reservaData);
                 if (result) {
-                    // Recargar las reservas en el sidebar después de crear la reserva
-                    const todasLasReservas = await window.loadReservasUsuario(currentUser.uid);
+                    const user = window.auth.getCurrentUser();
+
+                    // Recargar las reservas del usuario o todas (como prefieras)
+                    const todasLasReservas = await window.loadTodasLasReservas();
                     if (todasLasReservas) {
-                        displayReservasSidebar(todasLasReservas);
+                        displayReservasSidebar(todasLasReservas, user?.uid);
                     }
 
                     showSuccessPopup();
@@ -836,6 +847,7 @@
                         window.location.href = '/rooms';
                     }, 2000);
                 }
+
 
             } catch (error) {
                 showMessage('Error al crear la reserva: ' + error.message, 'error');
