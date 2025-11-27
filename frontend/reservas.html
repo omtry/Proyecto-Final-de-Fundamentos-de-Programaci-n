@@ -146,6 +146,7 @@
         // Variables globales
         let salas = [];
         let horarios = [];
+        let salaActualId = null;
 
         // Inicializar página
         document.addEventListener('DOMContentLoaded', function () {
@@ -258,6 +259,28 @@
                     });
                 }
 
+                // Recargar el sidebar mostrando solo las reservas de la sala actual
+                async function refrescarSidebarReservas() {
+                    const sidebarContainer = document.getElementById('reservasSidebarContainer');
+                    if (!sidebarContainer) return;
+
+                    const user = window.auth.getCurrentUser();
+                    const todasLasReservas = await window.loadTodasLasReservas();
+                    let reservasFiltradas = todasLasReservas || [];
+
+                    // Si hay una sala seleccionada, filtramos por esa sala
+                    if (salaActualId) {
+                        reservasFiltradas = reservasFiltradas.filter(r =>
+                            r.salaId === salaActualId ||            // caso típico
+                            r.sala_id === salaActualId ||           // por si el backend usa snake_case
+                            (r.sala && r.sala.id === salaActualId)  // por si viene anidada
+                        );
+                    }
+
+                    displayReservasSidebar(reservasFiltradas, user?.uid);
+                }
+
+
                 // Cargar salas PRIMERO
                 const salasResponse = await window.api.getSalas();
                 if (salasResponse.success) {
@@ -269,6 +292,7 @@
                     const salaIdParam = urlParams.get('sala');
                     if (salaIdParam) {
                         const salaId = parseInt(salaIdParam);
+                        salaActualId = salaId;
                         const salaSelect = document.getElementById('salaId');
                         if (salaSelect && salaSelect.options.length > 0) {
                             // Esperar un momento para asegurar que las opciones estén cargadas
@@ -299,16 +323,11 @@
                 }
 
                 // Cargar TODAS las reservas para el sidebar (no solo las del usuario)
+                // Cargar reservas para el sidebar (filtradas por sala)
                 const user = window.auth.getCurrentUser();
                 if (user) {
                     try {
-                        // Cargar TODAS las reservas (de todos los usuarios)
-                        const todasLasReservas = await window.loadTodasLasReservas();
-                        if (todasLasReservas && todasLasReservas.length > 0) {
-                            displayReservasSidebar(todasLasReservas, user.uid);
-                        } else {
-                            displayReservasSidebar([], user.uid);
-                        }
+                        await refrescarSidebarReservas(); // 👈 aquí
 
                         // Verificar reservas activas
                         const reservasActivas = await window.loadReservasActivas(user.uid);
@@ -352,6 +371,17 @@
                 console.error('Error al cargar datos iniciales:', error);
                 showMessage('Error al cargar los datos iniciales: ' + error.message, 'error');
             }
+
+            const salaSelect = document.getElementById('salaId');
+            if (salaSelect) {
+                salaSelect.addEventListener('change', function () {
+                    salaActualId = this.value ? parseInt(this.value) : null;
+                    refrescarSidebarReservas(); // 👈 actualizamos las reservas mostradas
+                });
+            }
+
+
+
         }
 
 
@@ -834,13 +864,7 @@
                 // Crear reserva
                 const result = await window.api.crearReserva(reservaData);
                 if (result) {
-                    const user = window.auth.getCurrentUser();
-
-                    // Recargar las reservas del usuario o todas (como prefieras)
-                    const todasLasReservas = await window.loadTodasLasReservas();
-                    if (todasLasReservas) {
-                        displayReservasSidebar(todasLasReservas, user?.uid);
-                    }
+                    await refrescarSidebarReservas(); // 👈 ahora respeta la sala
 
                     showSuccessPopup();
                     setTimeout(() => {
