@@ -1,6 +1,6 @@
 // API Client para conectar con el backend
 // Configuración de la API
-const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? (window.location.port === '3001' ? '/api' : 'http://localhost:3001/api')
     : '/api';
 
@@ -123,6 +123,14 @@ class ApiClient {
         });
     }
 
+    // Sincronizar usuario con backend
+    async syncUser(userData) {
+        return await this.request('/users/sync', {
+            method: 'POST',
+            body: JSON.stringify(userData)
+        });
+    }
+
     // ==================== VALIDACIONES ====================
 
     // Validar horario de reserva
@@ -161,6 +169,30 @@ class ApiClient {
     async eliminarSala(id, userId) {
         return await this.request(`/admin/salas/${id}?userId=${userId}`, {
             method: 'DELETE'
+        });
+    }
+
+    // Obtener TODAS las reservas (Admin)
+    async getAllReservations(userId) {
+        return await this.request('/reservas/admin/todas', {
+            headers: { 'user-id': userId }
+        });
+    }
+
+    // Actualizar cualquier reserva (Admin)
+    async updateReservationAdmin(id, datos, userId) {
+        return await this.request(`/reservas/admin/${id}`, {
+            method: 'PUT',
+            headers: { 'user-id': userId },
+            body: JSON.stringify(datos)
+        });
+    }
+
+    // Eliminar cualquier reserva (Admin)
+    async deleteReservationAdmin(id, userId) {
+        return await this.request(`/reservas/admin/${id}`, {
+            method: 'DELETE',
+            headers: { 'user-id': userId }
         });
     }
 

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Bookey</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    
+    <!-- FullCalendar CSS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+</head>
+<body>
+    <!-- Navbar (Reused structure) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">🔷</span>
+                Bookey <span style="font-size: 0.8em; color: var(--primary-color);">Admin</span>
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Inicio</a>
+                <a href="/rooms" class="nav-link">Salas</a>
+                <a href="/reservations" class="nav-link">Mis Reservas</a>
+                <a href="/admin-dashboard" class="nav-link active">Panel Admin</a>
+                <div id="userInfo" class="user-info">
+                    <!-- User info will be injected here -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1 class="dashboard-title">Gestión de Reservas</h1>
+            
+            <div class="dashboard-controls">
+                <div class="filter-container">
+                    <label for="roomFilter">Filtrar por sala:</label>
+                    <select id="roomFilter" class="filter-select">
+                        <option value="all">Todas las salas</option>
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+                
+                <button id="refreshBtn" class="btn-primary">
+                    🔄 Actualizar
+                </button>
+            </div>
+        </header>
+
+        <div class="calendar-wrapper">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- Edit/Create Modal -->
+    <div id="reservationModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle" class="modal-title">Editar Reserva</h2>
+                <button id="closeModal" class="close-modal">&times;</button>
+            </div>
+            
+            <div id="userInfoDetails" class="user-details">
+                <!-- User details injected here -->
+            </div>
+
+            <form id="reservationForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="editSala" class="form-label">Sala</label>
+                    <select id="editSala" class="form-control">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editFecha" class="form-label">Fecha</label>
+                    <input type="date" id="editFecha" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editHorario" class="form-label">Hora Inicio</label>
+                    <select id="editHorario" class="form-control" required>
+                        <option value="08:00">08:00 AM</option>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="13:00">01:00 PM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="15:00">03:00 PM</option>
+                        <option value="16:00">04:00 PM</option>
+                        <option value="17:00">05:00 PM</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDuracion" class="form-label">Duración (horas)</label>
+                    <select id="editDuracion" class="form-control" required>
+                        <option value="1">1 hora</option>
+                        <option value="2">2 horas</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editProposito" class="form-label">Propósito</label>
+                    <input type="text" id="editProposito" class="form-control" placeholder="Ej: Mentoría de JS">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="deleteBtn" class="btn-danger">Eliminar</button>
+                    <button type="button" id="cancelBtn" class="btn-secondary">Cancelar</button>
+                    <button type="button" id="saveBtn" class="btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>

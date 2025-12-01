@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Reserva = require('./models/Reserva');
+const User = require('./models/User');
 
 const app = express();
 
@@ -21,6 +22,38 @@ mongoose
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Middleware para verificar si es admin
+const isAdmin = async (req, res, next) => {
+  try {
+    const userId = req.headers['user-id'] || req.body.userId || req.query.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'No autorizado. Se requiere ID de usuario.'
+      });
+    }
+
+    const user = await User.findOne({ uid: userId });
+
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Acceso denegado. Se requieren permisos de administrador.'
+      });
+    }
+
+    req.currentUser = user;
+    next();
+  } catch (error) {
+    console.error('Error en middleware isAdmin:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al verificar permisos.'
+    });
+  }
+};
 
 // Archivos estáticos
 app.use(express.static(path.join(__dirname, 'frontend')));
@@ -46,6 +79,7 @@ app.get('/login', servePage('login.html'));
 app.get('/room-details', servePage('detalles_salas.html'));
 app.get('/reservations', servePage('reservas.html'));
 app.get('/auth/google/callback', servePage(path.join('auth', 'google', 'callback.html')));
+app.get('/admin-dashboard', servePage('admin-dashboard.html'));
 
 // ==================== SALAS (CATÁLOGO) ====================
 const salas = [
@@ -617,21 +651,197 @@ app.get('/api/disponibilidad', async (req, res) => {
 
 // ==================== USER BÁSICO (para verificarAdmin) ====================
 
-app.get('/api/user/:userId', (req, res) => {
+// ==================== USER BÁSICO (para verificarAdmin) ====================
+
+app.get('/api/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
+
+    // Buscar en MongoDB primero
+    let user = await User.findOne({ uid: userId });
+
+    if (!user) {
+      // Si no existe, devolver rol user por defecto
+      return res.json({
+        success: true,
+        data: {
+          id: userId,
+          role: 'user'
+        }
+      });
+    }
 
     res.json({
       success: true,
       data: {
-        id: userId,
-        role: 'user' // aquí luego puedes agregar lógica para admins
+        id: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        role: user.role
       }
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error al obtener información del usuario',
+      error: error.message
+    });
+  }
+});
+
+// Sincronizar usuario (desde Firebase a MongoDB)
+app.post('/api/users/sync', async (req, res) => {
+  try {
+    const { uid, email, displayName, photoURL } = req.body;
+
+    if (!uid || !email) {
+      return res.status(400).json({
+        success: false,
+        message: 'UID y Email son requeridos'
+      });
+    }
+
+    // Buscar si ya existe
+    let user = await User.findOne({ uid });
+
+    if (user) {
+      // Actualizar datos básicos (no el rol)
+      user.email = email;
+      user.displayName = displayName || user.displayName;
+      user.photoURL = photoURL || user.photoURL;
+      await user.save();
+    } else {
+      // Crear nuevo usuario
+      user = await User.create({
+        uid,
+        email,
+        displayName,
+        photoURL,
+        role: 'user' // Por defecto
+      });
+    }
+
+    res.json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    console.error('Error syncing user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al sincronizar usuario',
+      error: error.message
+    });
+  }
+});
+
+// ==================== RUTAS ADMIN ====================
+
+// Obtener TODAS las reservas (Admin)
+app.get('/api/reservas/admin/todas', isAdmin, async (req, res) => {
+  try {
+    const reservas = await Reserva.find().sort({ fechaCreacion: -1 });
+    res.json({
+      success: true,
+      data: reservas,
+      total: reservas.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener todas las reservas',
+      error: error.message
+    });
+  }
+});
+
+// Modificar cualquier reserva (Admin)
+app.put('/api/reservas/admin/:id', isAdmin, async (req, res) => {
+  try {
+    const reservaId = parseInt(req.params.id);
+    const datos = req.body;
+
+    const reserva = await Reserva.findOne({ id: reservaId });
+    if (!reserva) {
+      return res.status(404).json({
+        success: false,
+        message: 'Reserva no encontrada'
+      });
+    }
+
+    // Si cambia horario/duración/fecha/sala, revisar conflictos
+    const salaId = datos.salaId || reserva.salaId;
+    const fecha = datos.fecha || reserva.fecha;
+    const horario = datos.horario || reserva.horario;
+    const duracion = datos.duracion || reserva.duracion;
+
+    const hayConflicto = await tieneConflictoHorario({
+      salaId,
+      fecha,
+      horario,
+      duracion,
+      excluirReservaId: reservaId
+    });
+
+    if (hayConflicto) {
+      return res.status(409).json({
+        success: false,
+        message: 'La sala ya está reservada en ese horario.'
+      });
+    }
+
+    if (datos.horario || datos.duracion) {
+      datos.horaFin = calcularHoraFin(horario, duracion);
+    }
+
+    // Si cambia la sala, actualizar nombre de sala
+    if (datos.salaId) {
+      const nuevaSala = salas.find(s => s.id === parseInt(datos.salaId));
+      if (nuevaSala) {
+        datos.salaNombre = nuevaSala.nombre;
+      }
+    }
+
+    const reservaActualizada = await Reserva.findOneAndUpdate(
+      { id: reservaId },
+      datos,
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      data: reservaActualizada
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al actualizar la reserva',
+      error: error.message
+    });
+  }
+});
+
+// Eliminar cualquier reserva (Admin)
+app.delete('/api/reservas/admin/:id', isAdmin, async (req, res) => {
+  try {
+    const reservaId = parseInt(req.params.id);
+    const reservaEliminada = await Reserva.findOneAndDelete({ id: reservaId });
+
+    if (!reservaEliminada) {
+      return res.status(404).json({
+        success: false,
+        message: 'Reserva no encontrada'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Reserva eliminada correctamente por admin'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al eliminar la reserva',
       error: error.message
     });
   }

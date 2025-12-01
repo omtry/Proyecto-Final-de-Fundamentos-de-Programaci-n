@@ -39,25 +39,30 @@ async function initFirebase() {
             console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
             currentUser = user;
             isAuthenticated = !!user;
-            
+
             // Obtener rol del usuario si está autenticado
             if (user) {
                 await getUserRole(user.uid);
             } else {
                 userRole = 'user';
             }
-            
+
             updateUI();
             notifyAuthChange();
-            
-            // Redirect to home page after successful login
+
+            // Redirect to home page or admin dashboard after successful login
             if (user && window.location.pathname === '/login') {
-                console.log('Redirecting to home page after login...');
-                setTimeout(() => {
-                    window.location.href = '/';
+                console.log('Redirecting after login...');
+                setTimeout(async () => {
+                    const role = await getUserRole(user.uid);
+                    if (role === 'admin') {
+                        window.location.href = '/admin-dashboard.html';
+                    } else {
+                        window.location.href = '/';
+                    }
                 }, 1000);
             }
-            
+
             // If on profile page and user is not authenticated, redirect to login
             if (!user && window.location.pathname === '/profile') {
                 console.log('User not authenticated on profile page, redirecting to login...');
@@ -78,7 +83,7 @@ async function loginWithEmail(email, password) {
     if (!auth || !firebaseAuth) {
         throw new Error('Firebase no está inicializado. Por favor, recarga la página.');
     }
-    
+
     try {
         const { signInWithEmailAndPassword } = firebaseAuth;
         const result = await signInWithEmailAndPassword(auth, email, password);
@@ -86,10 +91,10 @@ async function loginWithEmail(email, password) {
         return true;
     } catch (error) {
         console.error('Login error:', error);
-        
+
         // Traducir errores de Firebase a mensajes más amigables
         let errorMessage = 'Error al iniciar sesión. Por favor, intenta de nuevo.';
-        
+
         if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
             errorMessage = 'Email o contraseña incorrectos. Por favor, verifica tus credenciales.';
         } else if (error.code === 'auth/invalid-email') {
@@ -104,7 +109,7 @@ async function loginWithEmail(email, password) {
             // Si hay un mensaje personalizado, usarlo
             errorMessage = error.message;
         }
-        
+
         // Lanzar el error con el mensaje traducido para que el frontend lo maneje
         throw new Error(errorMessage);
     }
@@ -113,7 +118,7 @@ async function loginWithEmail(email, password) {
 // Login con Google
 async function loginWithGoogle() {
     if (!auth || !firebaseAuth) return false;
-    
+
     try {
         const { GoogleAuthProvider, signInWithPopup } = firebaseAuth;
         const provider = new GoogleAuthProvider();
@@ -132,23 +137,23 @@ async function registerUser(email, password, displayName = '') {
     if (!auth || !firebaseAuth) {
         throw new Error('Firebase no está inicializado. Por favor, recarga la página.');
     }
-    
+
     try {
         const { createUserWithEmailAndPassword, updateProfile } = firebaseAuth;
         const result = await createUserWithEmailAndPassword(auth, email, password);
-        
+
         if (displayName) {
             await updateProfile(result.user, { displayName });
         }
-        
+
         await saveUserProfile(result.user);
         return true;
     } catch (error) {
         console.error('Register error:', error);
-        
+
         // Traducir errores de Firebase a mensajes más amigables
         let errorMessage = 'Error al registrar usuario. Por favor, intenta de nuevo.';
-        
+
         if (error.code === 'auth/email-already-in-use') {
             errorMessage = 'Este email ya está registrado. Por favor, inicia sesión o usa otro email.';
         } else if (error.code === 'auth/invalid-email') {
@@ -163,7 +168,7 @@ async function registerUser(email, password, displayName = '') {
             // Si hay un mensaje personalizado, usarlo
             errorMessage = error.message;
         }
-        
+
         // Lanzar el error con el mensaje traducido para que el frontend lo maneje
         throw new Error(errorMessage);
     }
@@ -172,21 +177,21 @@ async function registerUser(email, password, displayName = '') {
 // Cerrar sesión
 async function logout() {
     if (!auth || !firebaseAuth) return false;
-    
+
     try {
         const { signOut } = firebaseAuth;
         await signOut(auth);
-        
+
         // Clear local state
         currentUser = null;
         isAuthenticated = false;
-        
+
         // Update UI immediately
         updateUI();
-        
+
         // Redirect to home page
         window.location.href = '/';
-        
+
         return true;
     } catch (error) {
         console.error('Logout error:', error);
@@ -200,7 +205,7 @@ async function resetPassword(email) {
     if (!auth || !firebaseAuth) {
         throw new Error('Firebase no está inicializado');
     }
-    
+
     try {
         const { sendPasswordResetEmail } = firebaseAuth;
         await sendPasswordResetEmail(auth, email);
@@ -218,12 +223,12 @@ async function getUserRole(userId) {
         userRole = 'user';
         return 'user';
     }
-    
+
     try {
         const { doc, getDoc } = firebaseFirestore;
         const userRef = doc(db, 'users', userId);
         const userSnap = await getDoc(userRef);
-        
+
         if (userSnap.exists()) {
             const userData = userSnap.data();
             userRole = userData.role || 'user';
@@ -244,12 +249,12 @@ async function getUserRole(userId) {
 // Guardar perfil de usuario
 async function saveUserProfile(user) {
     if (!db || !user || !firebaseFirestore) return;
-    
+
     try {
         const { doc, getDoc, setDoc } = firebaseFirestore;
         const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
-        
+
         if (!userSnap.exists()) {
             await setDoc(userRef, {
                 uid: user.uid,
@@ -266,10 +271,11 @@ async function saveUserProfile(user) {
             userRole = userData.role || 'user';
         }
 
-        // Sincronizar con el backend si está disponible
-        if (window.API && window.API.usuarios) {
+        // Sincronizar con el backend
+        if (window.api) {
             try {
-                await window.API.usuarios.sync({
+                await window.api.syncUser({
+                    uid: user.uid,
                     email: user.email,
                     displayName: user.displayName || '',
                     photoURL: user.photoURL || ''
@@ -293,7 +299,7 @@ function isAdmin() {
 function updateUI() {
     const userInfo = document.getElementById('userInfo');
     const profileLink = document.getElementById('profileLink');
-    
+
     if (isAuthenticated && currentUser) {
         if (userInfo) {
             userInfo.innerHTML = `
@@ -306,20 +312,36 @@ function updateUI() {
                 </div>
             `;
         }
-        
+
         // Show profile link when authenticated
         if (profileLink) {
             profileLink.style.display = 'block';
+        }
+
+        // Show Admin Panel link if admin
+        const adminLink = document.querySelector('a[href="/admin-dashboard"]');
+        if (adminLink) {
+            if (userRole === 'admin') {
+                adminLink.style.display = 'block';
+            } else {
+                adminLink.style.display = 'none';
+            }
         }
     } else {
         // Don't show login button in navbar when not authenticated
         if (userInfo) {
             userInfo.innerHTML = '';
         }
-        
+
         // Hide profile link when not authenticated
         if (profileLink) {
             profileLink.style.display = 'none';
+        }
+
+        // Hide Admin Panel link
+        const adminLink = document.querySelector('a[href="/admin-dashboard"]');
+        if (adminLink) {
+            adminLink.style.display = 'none';
         }
     }
 
@@ -378,6 +400,6 @@ window.auth = {
 };
 
 // Inicializar cuando se carga la página
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     initFirebase();
 });
