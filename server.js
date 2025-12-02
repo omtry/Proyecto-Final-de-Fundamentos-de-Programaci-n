@@ -709,6 +709,9 @@ app.post('/api/users/sync', async (req, res) => {
       user.email = email;
       user.displayName = displayName || user.displayName;
       user.photoURL = photoURL || user.photoURL;
+      if (email === 'admin@bookey.com') {
+        user.role = 'admin';
+      }
       await user.save();
     } else {
       // Crear nuevo usuario
@@ -717,7 +720,7 @@ app.post('/api/users/sync', async (req, res) => {
         email,
         displayName,
         photoURL,
-        role: 'user' // Por defecto
+        role: email === 'admin@bookey.com' ? 'admin' : 'user'
       });
     }
 

@@ -261,7 +261,7 @@ async function saveUserProfile(user) {
                 email: user.email,
                 displayName: user.displayName || '',
                 photoURL: user.photoURL || '',
-                role: 'user', // Rol por defecto
+                role: user.email === 'admin@bookey.com' ? 'admin' : 'user',
                 createdAt: new Date().toISOString()
             });
             userRole = 'user';
@@ -269,6 +269,12 @@ async function saveUserProfile(user) {
             // Si ya existe, obtener el rol actual
             const userData = userSnap.data();
             userRole = userData.role || 'user';
+
+            // Force admin for specific email if not already
+            if (user.email === 'admin@bookey.com' && userRole !== 'admin') {
+                await setDoc(userRef, { role: 'admin' }, { merge: true });
+                userRole = 'admin';
+            }
         }
 
         // Sincronizar con el backend
