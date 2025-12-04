@@ -159,7 +159,7 @@ class ApiClient {
 
     // Crear nueva sala (solo admin)
     async crearSala(salaData) {
-        return await this.request('/admin/salas', {
+        return await this.request('/salas', {
             method: 'POST',
             body: JSON.stringify(salaData)
         });
@@ -167,7 +167,7 @@ class ApiClient {
 
     // Eliminar sala (solo admin)
     async eliminarSala(id, userId) {
-        return await this.request(`/admin/salas/${id}?userId=${userId}`, {
+        return await this.request(`/salas/${id}?userId=${userId}`, {
             method: 'DELETE'
         });
     }
@@ -668,6 +668,8 @@ async function initSalasPage() {
                 const reservaActual = disp ? disp.reservaActual : null;
                 const puedeReservar = !tieneDosReservas;
 
+                const isAdmin = window.auth && window.auth.isAdmin();
+
                 return `
                 <div class="room-card">
                     <div class="room-content">
@@ -675,6 +677,11 @@ async function initSalasPage() {
                         <div class="room-info">
                             <div class="room-header">
                                 <h2 class="room-title">${sala.nombre}</h2>
+                                ${isAdmin ? `
+                                <button onclick="eliminarSala(${sala.id})" class="btn-delete-room" title="Eliminar sala">
+                                    🗑️
+                                </button>
+                                ` : ''}
                             </div>
                             <p class="room-description">${sala.descripcion}</p>
                             ${reservaActual ? `
@@ -730,6 +737,37 @@ async function initSalasPage() {
             </div>
         `;
     }
+}
+
+// Eliminar sala (Admin)
+async function eliminarSala(salaId) {
+    if (!window.auth || !window.auth.isAdmin()) {
+        showNotification('No tienes permisos para realizar esta acción', 'error');
+        return;
+    }
+
+    showConfirmModal(
+        '¿Estás seguro de que quieres eliminar esta sala? Esta acción no se puede deshacer.',
+        async () => {
+            try {
+                const user = window.auth.getCurrentUser();
+                // Usar el ID del usuario actual para autenticación
+                const response = await window.api.eliminarSala(salaId, user.uid);
+
+                if (response.success) {
+                    showNotification('Sala eliminada correctamente', 'success');
+                    // Recargar la página para ver cambios
+                    setTimeout(() => {
+                        initSalasPage();
+                    }, 1000);
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (error) {
+                handleApiError(error);
+            }
+        }
+    );
 }
 
 // Mostrar reservas activas del usuario

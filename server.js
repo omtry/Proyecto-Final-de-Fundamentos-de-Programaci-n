@@ -5,6 +5,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const Reserva = require('./models/Reserva');
 const User = require('./models/User');
+const Sala = require('./models/Sala');
 
 const app = express();
 
@@ -13,16 +14,31 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Mentorias'
 const PORT = process.env.PORT || 3001;
 
 // ==================== CONEXIÓN A MONGODB ====================
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log('✅ Conectado a MongoDB'))
-  .catch(err => console.error('❌ Error al conectar MongoDB:', err));
+let isMongoConnected = false;
+
+
+async function connectDB() {
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log("📌 Conectado a MongoDB correctamente");
+    isMongoConnected = true;
+
+    // Inicializar salas si es necesario
+    await initSalas();
+  } catch (error) {
+    console.error("❌ Error al conectar a MongoDB:", error);
+    isMongoConnected = false;
+  }
+}
+
+connectDB();
 
 // ==================== MIDDLEWARES ====================
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware para verificar si es admin
 // Middleware para verificar si es admin
 const isAdmin = async (req, res, next) => {
   try {
@@ -32,6 +48,24 @@ const isAdmin = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: 'No autorizado. Se requiere ID de usuario.'
+      });
+    }
+
+    // Bypass for local admin
+    if (userId === 'admin-12345') {
+      req.currentUser = {
+        uid: 'admin-12345',
+        email: 'admin@bookey.com',
+        role: 'admin'
+      };
+      return next();
+    }
+
+    // If DB is not connected and not local admin, deny
+    if (!isMongoConnected) {
+      return res.status(503).json({
+        success: false,
+        message: 'Servicio no disponible. Base de datos desconectada.'
       });
     }
 
@@ -82,7 +116,10 @@ app.get('/auth/google/callback', servePage(path.join('auth', 'google', 'callback
 app.get('/admin-dashboard', servePage('admin-dashboard.html'));
 
 // ==================== SALAS (CATÁLOGO) ====================
-const salas = [
+
+
+// Datos en memoria (Fallback)
+let salasMemory = [
   {
     id: 1,
     nombre: 'Sala 201',
@@ -155,6 +192,27 @@ const salas = [
   }
 ];
 
+// Estado de conexión
+// Estado de conexión eliminado de aquí para evitar duplicados
+// Los listeners también se eliminan para evitar doble inicialización
+
+
+// Inicializar salas si está vacío (Solo si hay DB)
+async function initSalas() {
+  try {
+    if (!isMongoConnected) return;
+
+    const count = await Sala.countDocuments();
+    if (count === 0) {
+      console.log('Inicializando base de datos de salas...');
+      await Sala.insertMany(salasMemory);
+      console.log('✅ Salas inicializadas correctamente');
+    }
+  } catch (error) {
+    console.error('Error al inicializar salas:', error);
+  }
+}
+
 // ==================== HELPERS DE RESERVAS ====================
 
 // Calcula la hora de fin dado un horario "HH:MM" y duración en horas
@@ -178,31 +236,41 @@ function esReservaActiva(reserva) {
   return horaActual >= reserva.horario && horaActual < horaFin;
 }
 
-// Reservas activas de un usuario (usa Mongo)
+// Reservas activas de un usuario (usa Mongo o Memoria)
 async function getReservasActivasUsuario(userId) {
-  const reservas = await Reserva.find({
-    userId,
-    estado: 'confirmada'
-  }).lean();
-
-  return reservas.filter(r => esReservaActiva(r));
+  if (isMongoConnected) {
+    const reservas = await Reserva.find({
+      userId,
+      estado: 'confirmada'
+    }).lean();
+    return reservas.filter(r => esReservaActiva(r));
+  } else {
+    // Fallback memoria (no implementado full para reservas, pero evita crash)
+    return [];
+  }
 }
 
 // Verifica si hay conflicto de horario en una sala
 async function tieneConflictoHorario({ salaId, fecha, horario, duracion, excluirReservaId = null }) {
   const horaFin = calcularHoraFin(horario, duracion);
 
-  const query = {
-    salaId,
-    fecha,
-    estado: 'confirmada'
-  };
+  let reservasSala = [];
 
-  if (excluirReservaId) {
-    query.id = { $ne: excluirReservaId };
+  if (isMongoConnected) {
+    const query = {
+      salaId,
+      fecha,
+      estado: 'confirmada'
+    };
+    if (excluirReservaId) {
+      query.id = { $ne: excluirReservaId };
+    }
+    reservasSala = await Reserva.find(query).lean();
+  } else {
+    // Fallback: Sin validación de conflictos en modo offline por ahora
+    // o podríamos implementar un array reservasMemory si fuera necesario
+    return false;
   }
-
-  const reservasSala = await Reserva.find(query).lean();
 
   return reservasSala.some(r => {
     const rHoraFin = r.horaFin || calcularHoraFin(r.horario, r.duracion);
@@ -225,12 +293,20 @@ app.get('/api/test', (req, res) => {
 // ==================== SALAS ====================
 
 // GET /api/salas  -> lista todas las salas
-app.get('/api/salas', (req, res) => {
+app.get('/api/salas', async (req, res) => {
   try {
+    let data;
+    if (isMongoConnected) {
+      data = await Sala.find().sort({ id: 1 });
+    } else {
+      console.log('⚠️ Usando salas en memoria (DB no conectada)');
+      data = salasMemory;
+    }
+
     res.json({
       success: true,
-      data: salas,
-      total: salas.length
+      data: data,
+      total: data.length
     });
   } catch (error) {
     res.status(500).json({
@@ -242,10 +318,16 @@ app.get('/api/salas', (req, res) => {
 });
 
 // GET /api/salas/:id  -> sala por ID
-app.get('/api/salas/:id', (req, res) => {
+app.get('/api/salas/:id', async (req, res) => {
   try {
     const salaId = parseInt(req.params.id);
-    const sala = salas.find(s => s.id === salaId);
+    let sala;
+
+    if (isMongoConnected) {
+      sala = await Sala.findOne({ id: salaId });
+    } else {
+      sala = salasMemory.find(s => s.id === salaId);
+    }
 
     if (!sala) {
       return res.status(404).json({
@@ -262,6 +344,99 @@ app.get('/api/salas/:id', (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al obtener la sala',
+      error: error.message
+    });
+  }
+});
+
+// POST /api/salas (Admin) -> Crear sala
+app.post('/api/salas', isAdmin, async (req, res) => {
+  try {
+    const { nombre, tipo, descripcion, capacidad, imagen, equipamiento } = req.body;
+    let nuevaSala;
+
+    if (isMongoConnected) {
+      const lastSala = await Sala.findOne().sort({ id: -1 });
+      const newId = lastSala ? lastSala.id + 1 : 1;
+
+      nuevaSala = await Sala.create({
+        id: newId,
+        nombre,
+        tipo,
+        descripcion,
+        capacidad,
+        imagen: imagen || '/img/default-room.jpg',
+        equipamiento: equipamiento || []
+      });
+    } else {
+      const newId = salasMemory.length > 0 ? Math.max(...salasMemory.map(s => s.id)) + 1 : 1;
+      nuevaSala = {
+        id: newId,
+        nombre,
+        tipo,
+        descripcion,
+        capacidad,
+        imagen: imagen || '/img/default-room.jpg',
+        equipamiento: equipamiento || [],
+        disponible: true
+      };
+      salasMemory.push(nuevaSala);
+    }
+
+    res.json({
+      success: true,
+      data: nuevaSala,
+      message: 'Sala creada correctamente' + (!isMongoConnected ? ' (En memoria)' : '')
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al crear la sala',
+      error: error.message
+    });
+  }
+});
+
+// DELETE /api/salas/:id (Admin) -> Eliminar sala
+app.delete('/api/salas/:id', isAdmin, async (req, res) => {
+  try {
+    const salaId = parseInt(req.params.id);
+
+    // Verificar reservas (solo si hay DB)
+    if (isMongoConnected) {
+      const reservasFuturas = await Reserva.countDocuments({
+        salaId: salaId,
+        fecha: { $gte: new Date().toISOString().split('T')[0] },
+        estado: 'confirmada'
+      });
+
+      if (reservasFuturas > 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'No se puede eliminar la sala porque tiene reservas activas.'
+        });
+      }
+
+      const resultado = await Sala.findOneAndDelete({ id: salaId });
+      if (!resultado) {
+        return res.status(404).json({ success: false, message: 'Sala no encontrada' });
+      }
+    } else {
+      const index = salasMemory.findIndex(s => s.id === salaId);
+      if (index === -1) {
+        return res.status(404).json({ success: false, message: 'Sala no encontrada' });
+      }
+      salasMemory.splice(index, 1);
+    }
+
+    res.json({
+      success: true,
+      message: 'Sala eliminada correctamente' + (!isMongoConnected ? ' (En memoria)' : '')
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error al eliminar la sala',
       error: error.message
     });
   }
@@ -364,7 +539,13 @@ app.post('/api/reservas', async (req, res) => {
       });
     }
 
-    const sala = salas.find(s => s.id === parseInt(salaId));
+    let sala;
+    if (isMongoConnected) {
+      sala = await Sala.findOne({ id: parseInt(salaId) });
+    } else {
+      sala = salasMemory.find(s => s.id === parseInt(salaId));
+    }
+
     if (!sala) {
       return res.status(404).json({
         success: false,
@@ -589,6 +770,13 @@ app.get('/api/disponibilidad', async (req, res) => {
     const fechaActual = ahora.toISOString().split('T')[0];
     const horaActual = ahora.toTimeString().slice(0, 5);
 
+    let salas;
+    if (isMongoConnected) {
+      salas = await Sala.find().sort({ id: 1 });
+    } else {
+      salas = salasMemory;
+    }
+
     const disponibilidad = salas.map(sala => {
       const reservasSala = reservasFecha.filter(r => r.salaId === sala.id);
 
@@ -658,7 +846,20 @@ app.get('/api/user/:userId', async (req, res) => {
     const { userId } = req.params;
 
     // Buscar en MongoDB primero
-    let user = await User.findOne({ uid: userId });
+    let user = null;
+    if (isMongoConnected) {
+      user = await User.findOne({ uid: userId });
+    } else {
+      // Fallback para admin en memoria
+      if (userId === 'admin-12345') {
+        user = {
+          uid: 'admin-12345',
+          email: 'admin@bookey.com',
+          displayName: 'Admin Bookey',
+          role: 'admin'
+        };
+      }
+    }
 
     if (!user) {
       // Si no existe, devolver rol user por defecto
@@ -702,6 +903,10 @@ app.post('/api/users/sync', async (req, res) => {
     }
 
     // Buscar si ya existe
+    if (!isMongoConnected) {
+      return res.json({ success: true, data: { uid, email, displayName, role: 'user' } });
+    }
+
     let user = await User.findOne({ uid });
 
     if (user) {

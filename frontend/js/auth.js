@@ -22,6 +22,26 @@ let firebaseAuth, firebaseFirestore;
 
 // Inicializar Firebase
 async function initFirebase() {
+    // Check for local admin session first
+    const localUserStr = localStorage.getItem('localUser');
+    if (localUserStr) {
+        try {
+            const localUser = JSON.parse(localUserStr);
+            if (localUser.role === 'admin') {
+                console.log('Restoring local admin session');
+                currentUser = localUser;
+                isAuthenticated = true;
+                userRole = 'admin';
+                updateUI();
+                notifyAuthChange();
+                return true;
+            }
+        } catch (e) {
+            console.error('Error parsing local user', e);
+            localStorage.removeItem('localUser');
+        }
+    }
+
     try {
         const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
         firebaseAuth = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
@@ -37,6 +57,10 @@ async function initFirebase() {
         // Auth state listener
         onAuthStateChanged(auth, async (user) => {
             console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
+
+            // If we have a local admin session, ignore firebase updates that might clear it
+            if (localStorage.getItem('localUser')) return;
+
             currentUser = user;
             isAuthenticated = !!user;
 
@@ -80,6 +104,28 @@ async function initFirebase() {
 
 // Login con email y contraseña
 async function loginWithEmail(email, password) {
+    // Check for special admin credentials
+    if (email === 'admin@bookey.com' && password === '12345') {
+        const adminUser = {
+            uid: 'admin-12345',
+            email: 'admin@bookey.com',
+            displayName: 'Admin Bookey',
+            photoURL: '',
+            role: 'admin'
+        };
+
+        currentUser = adminUser;
+        isAuthenticated = true;
+        userRole = 'admin';
+
+        // Save to localStorage to persist session
+        localStorage.setItem('localUser', JSON.stringify(adminUser));
+
+        updateUI();
+        notifyAuthChange();
+        return true;
+    }
+
     if (!auth || !firebaseAuth) {
         throw new Error('Firebase no está inicializado. Por favor, recarga la página.');
     }
@@ -176,6 +222,17 @@ async function registerUser(email, password, displayName = '') {
 
 // Cerrar sesión
 async function logout() {
+    // Clear local session
+    if (localStorage.getItem('localUser')) {
+        localStorage.removeItem('localUser');
+        currentUser = null;
+        isAuthenticated = false;
+        userRole = 'user';
+        updateUI();
+        window.location.href = '/';
+        return true;
+    }
+
     if (!auth || !firebaseAuth) return false;
 
     try {

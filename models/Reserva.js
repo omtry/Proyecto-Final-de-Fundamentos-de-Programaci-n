@@ -8,7 +8,7 @@ const ReservaSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-    userName: { type: String },
+  userName: { type: String },
   userEmail: { type: String },
   userId: { type: String, required: true },      // uid de Firebase
   salaId: { type: Number, required: true },      // 1..7

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/admin-dashboard.css">
-    
+    <link rel="stylesheet" href="css/admin-rooms.css">
+
     <!-- FullCalendar CSS -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 </head>
+
 <body>
     <!-- Navbar (Reused structure) -->
     <nav class="navbar">
@@ -35,9 +38,12 @@
 
     <div class="dashboard-container">
         <header class="dashboard-header">
-            <h1 class="dashboard-title">Gestión de Reservas</h1>
-            
+            <h1 class="dashboard-title">Panel de Administración</h1>
+
             <div class="dashboard-controls">
+                <button id="manageRoomsBtn" class="btn-secondary">
+                    🏢 Gestionar Salas
+                </button>
                 <div class="filter-container">
                     <label for="roomFilter">Filtrar por sala:</label>
                     <select id="roomFilter" class="filter-select">
@@ -45,12 +51,23 @@
                         <!-- Options populated by JS -->
                     </select>
                 </div>
-                
+
                 <button id="refreshBtn" class="btn-primary">
                     🔄 Actualizar
                 </button>
             </div>
         </header>
+
+        <!-- Room Management Section (Hidden by default) -->
+        <div id="roomManagementSection" class="room-management-section" style="display: none;">
+            <div class="section-header">
+                <h2>Gestión de Salas</h2>
+                <button id="addRoomBtn" class="btn-primary">➕ Nueva Sala</button>
+            </div>
+            <div id="roomsList" class="rooms-grid">
+                <!-- Rooms populated by JS -->
+            </div>
+        </div>
 
         <div class="calendar-wrapper">
             <div id="calendar"></div>
@@ -64,7 +81,7 @@
                 <h2 id="modalTitle" class="modal-title">Editar Reserva</h2>
                 <button id="closeModal" class="close-modal">&times;</button>
             </div>
-            
+
             <div id="userInfoDetails" class="user-details">
                 <!-- User details injected here -->
             </div>
@@ -120,9 +137,47 @@
         </div>
     </div>
 
+    <!-- Create Room Modal -->
+    <div id="roomModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nueva Sala</h2>
+                <button id="closeRoomModal" class="close-modal">&times;</button>
+            </div>
+
+            <form id="roomForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="roomName" class="form-label">Nombre</label>
+                    <input type="text" id="roomName" class="form-control" placeholder="Ej: Sala 208" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomType" class="form-label">Tipo</label>
+                    <input type="text" id="roomType" class="form-control" placeholder="Ej: Focus" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomDesc" class="form-label">Descripción</label>
+                    <textarea id="roomDesc" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomCap" class="form-label">Capacidad</label>
+                    <input type="number" id="roomCap" class="form-control" min="1" value="4" required>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancelRoomBtn" class="btn-secondary">Cancelar</button>
+                    <button type="button" id="saveRoomBtn" class="btn-primary">Crear Sala</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/api.js"></script>
     <script type="module" src="js/auth.js"></script>
     <script src="js/admin-dashboard.js"></script>
 </body>
+
 </html>

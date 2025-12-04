@@ -7,6 +7,133 @@
     <title>Bookey - Salas de Mentoría</title>
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/rooms.css">
+    <style>
+        .btn-create-room {
+            background-color: #10B981;
+            /* Green */
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-create-room:hover {
+            background-color: #059669;
+        }
+
+        .btn-delete-room {
+            background-color: #EF4444;
+            /* Red */
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-left: auto;
+        }
+
+        .btn-delete-room:hover {
+            background-color: #DC2626;
+        }
+
+        .room-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        /* Modal Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text);
+            transition: all 0.2s;
+            background-color: #F9FAFB;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-control::placeholder {
+            color: #9CA3AF;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0052CC;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--text-light);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #F3F4F6;
+            color: var(--text);
+            border-color: #D1D5DB;
+        }
+    </style>
 </head>
 
 <body>
@@ -29,6 +156,13 @@
             <p class="hero-subtitle">Espacios diseñados para el crecimiento académico y la colaboración</p>
         </div>
 
+        <!-- Admin Actions -->
+        <div id="adminActions" class="admin-actions" style="display: none; margin-bottom: 2rem; text-align: right;">
+            <button id="createRoomBtn" class="btn-create-room">
+                + Nueva Sala
+            </button>
+        </div>
+
         <!-- Mis Reservas Activas -->
         <div class="my-reservations" id="myReservations" style="display: none;">
             <h2 class="my-reservations-title">Mis Reservas Activas</h2>
@@ -46,13 +180,50 @@
         </div>
     </div>
 
+    <!-- Create Room Modal -->
+    <div id="roomModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nueva Sala</h2>
+                <button id="closeRoomModal" class="close-modal">&times;</button>
+            </div>
+
+            <form id="roomForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="roomName" class="form-label">Nombre</label>
+                    <input type="text" id="roomName" class="form-control" placeholder="Ej: Sala 208" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomType" class="form-label">Tipo</label>
+                    <input type="text" id="roomType" class="form-control" placeholder="Ej: Focus" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomDesc" class="form-label">Descripción</label>
+                    <textarea id="roomDesc" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="roomCap" class="form-label">Capacidad</label>
+                    <input type="number" id="roomCap" class="form-control" min="1" value="6" required>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancelRoomBtn" class="btn-secondary">Cancelar</button>
+                    <button type="button" id="saveRoomBtn" class="btn-primary">Crear Sala</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Include Auth Script -->
     <script src="/js/auth.js"></script>
     <!-- Include API Script -->
     <script src="/js/api.js"></script>
 
     <script>
-        // Simple navigation highlighting (without preventing default)
+        // Simple navigation highlighting
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function () {
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -60,27 +231,264 @@
             });
         });
 
-        // Cargar salas dinámicamente
-        // Cargar salas dinámicamente
+        // Function to initialize and load rooms
+        async function initSalasPage() {
+            const container = document.getElementById('salas-container');
+            if (!container) return;
+
+            container.innerHTML = '<div class="loading"><p>Cargando salas...</p></div>';
+
+            try {
+                const result = await window.api.getSalas();
+
+                // ============================================================
+                // PEGA TU CÓDIGO AQUÍ (Líneas de Debug)
+                // ============================================================
+                console.log("Datos recibidos del servidor:", result.data);
+                console.log("Cantidad de salas:", result.data ? result.data.length : 0);
+                // ============================================================
+
+                if (result.success && result.data) {
+                    container.innerHTML = ''; // Esto limpia el contenedor
+
+                    // ... (resto del código que crea las tarjetas) ..
+
+
+                    const isAdmin = window.auth && window.auth.isAdmin();
+
+                    result.data.forEach(sala => {
+                        const card = document.createElement('div');
+                        card.className = 'room-card';
+
+                        const equipamientoHtml = sala.equipamiento
+                            ? sala.equipamiento.map(item => `<span class="tag">${item}</span>`).join('')
+                            : '';
+
+                        const deleteBtn = isAdmin
+                            ? `<button class="btn-delete-room" onclick="deleteRoom(${sala.id})">🗑️</button>`
+                            : '';
+
+                        card.innerHTML = `
+                            <img src="${sala.imagen}" alt="${sala.nombre}" class="room-image">
+                            <div class="room-content">
+                                <div class="room-header">
+                                    <h3 class="room-title">${sala.nombre}</h3>
+                                    ${deleteBtn}
+                                </div>
+                                <div class="room-type">${sala.tipo}</div>
+                                <p class="room-description">${sala.descripcion}</p>
+                                <div class="room-meta">
+                                    <span>👥 Capacidad: ${sala.capacidad} personas</span>
+                                </div>
+                                <div class="room-tags">
+                                    ${equipamientoHtml}
+                                </div>
+                                <button class="btn-book" onclick="window.location.href='/reservations?sala=${sala.id}'">Reservar</button>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    container.innerHTML = '<div class="error"><p>Error al cargar las salas.</p></div>';
+                }
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+                container.innerHTML = '<div class="error"><p>Error de conexión al cargar las salas.</p></div>';
+            }
+        }
+
+        // Function to delete room (global scope for onclick)
+        window.deleteRoom = async (id) => {
+            // Get current user for auth verification
+            const user = window.auth ? window.auth.getCurrentUser() : null;
+
+            if (!user) {
+                if (typeof showNotification === 'function') {
+                    showNotification('Debes iniciar sesión para realizar esta acción', 'error');
+                } else {
+                    alert('Debes iniciar sesión para realizar esta acción');
+                }
+                return;
+            }
+
+            const confirmAction = async () => {
+                try {
+                    const result = await window.api.eliminarSala(id, user.uid);
+                    if (result.success) {
+                        if (typeof showNotification === 'function') {
+                            showNotification('Sala eliminada correctamente', 'success');
+                        } else {
+                            alert('Sala eliminada correctamente');
+                        }
+                        initSalasPage();
+                    } else {
+                        if (typeof showNotification === 'function') {
+                            showNotification('Error al eliminar sala: ' + result.message, 'error');
+                        } else {
+                            alert('Error al eliminar sala: ' + result.message);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error deleting room:', error);
+                    if (typeof showNotification === 'function') {
+                        showNotification('Error al eliminar la sala', 'error');
+                    } else {
+                        alert('Error al eliminar la sala');
+                    }
+                }
+            };
+
+            if (typeof showConfirmModal === 'function') {
+                showConfirmModal(
+                    '¿Estás seguro de que deseas eliminar esta sala? Esta acción no se puede deshacer.',
+                    confirmAction
+                );
+            } else {
+                if (confirm('¿Estás seguro de que deseas eliminar esta sala?')) {
+                    confirmAction();
+                }
+            }
+        };
+
+        // Main initialization logic
+        // Main initialization logic
         document.addEventListener('DOMContentLoaded', function () {
-            // Escuchar cambios en la autenticación
+            let pageInitialized = false; // Bandera para evitar doble carga
+
+            // Función para iniciar de forma segura
+            const safeInit = () => {
+                if (pageInitialized) return; // Si ya cargó, no hacer nada
+                pageInitialized = true;
+                initSalasPage();
+            };
+
+            // 1. Escuchar cambios en la autenticación (Login/Logout/Carga inicial)
             window.addEventListener('authStateChanged', function (e) {
                 const { user, isAuthenticated } = e.detail;
-                if (window.auth) {
-                    window.auth.updateUI();
+
+                if (window.auth) window.auth.updateUI();
+
+                // Mostrar/Ocultar acciones de admin
+                const adminActions = document.getElementById('adminActions');
+                if (adminActions) {
+                    adminActions.style.display = (window.auth && window.auth.isAdmin()) ? 'block' : 'none';
                 }
-                // Reinicializar la página cuando cambia el estado de auth
+
+                // Recargar salas (aquí forzamos la recarga si cambia el usuario)
+                // Nota: Reseteamos la bandera para permitir recarga si el usuario cambia
+                pageInitialized = true;
                 initSalasPage();
             });
 
-            // Si ya estamos autenticados al cargar (caso raro pero posible por caché)
-            // o si auth.js ya terminó de inicializar antes de este script
-            if (window.auth && window.auth.isAuthenticated()) {
-                initSalasPage();
-            } else {
-                // Si no estamos autenticados aún, cargar salas de todas formas (sin info de usuario)
-                // Esto permite ver las salas mientras se verifica el login en segundo plano
-                initSalasPage();
+            // 2. Comprobación inicial de seguridad
+            // Solo si el sistema de Auth ya cargó y NO disparó el evento todavía
+            if (window.auth && window.auth.isAuthenticated() && !pageInitialized) {
+                // Configuramos UI inicial
+                if (window.auth) window.auth.updateUI();
+                const adminActions = document.getElementById('adminActions');
+                if (adminActions && window.auth.isAdmin()) {
+                    adminActions.style.display = 'block';
+                }
+                safeInit();
+            } else if (!window.auth && !pageInitialized) {
+                // Si no hay sistema de auth cargado aún, cargamos las salas como público
+                safeInit();
+            }
+
+            // ==================== MODAL LOGIC ====================
+            const modal = document.getElementById('roomModal');
+            const createBtn = document.getElementById('createRoomBtn');
+            const closeBtn = document.getElementById('closeRoomModal');
+            const cancelBtn = document.getElementById('cancelRoomBtn');
+            const saveBtn = document.getElementById('saveRoomBtn');
+
+            if (createBtn) {
+                createBtn.addEventListener('click', async () => {
+                    modal.style.display = 'flex';
+
+                    // Auto-increment Room Name Logic
+                    try {
+                        const rooms = await window.api.getSalas();
+                        if (rooms && rooms.data) {
+                            let maxNum = 0;
+                            rooms.data.forEach(room => {
+                                const match = room.nombre.match(/(\d+)/);
+                                if (match) {
+                                    const num = parseInt(match[0]);
+                                    if (num > maxNum) maxNum = num;
+                                }
+                            });
+                            const nextNum = maxNum > 0 ? maxNum + 1 : 201; // Default start if no rooms
+                            document.getElementById('roomName').value = `Sala ${nextNum}`;
+                        }
+                    } catch (e) {
+                        console.error("Error calculating next room number", e);
+                        document.getElementById('roomName').value = "Sala ";
+                    }
+                });
+            }
+
+            const closeModal = () => {
+                modal.style.display = 'none';
+                document.getElementById('roomForm').reset();
+                // Reset to default capacity 6
+                document.getElementById('roomCap').value = 6;
+            };
+
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+            // Close on outside click
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Save Room
+            if (saveBtn) {
+                saveBtn.addEventListener('click', async () => {
+                    const name = document.getElementById('roomName').value;
+                    const type = document.getElementById('roomType').value;
+                    const desc = document.getElementById('roomDesc').value;
+                    const cap = document.getElementById('roomCap').value;
+
+                    if (!name || !type || !desc || !cap) {
+                        alert('Por favor completa todos los campos');
+                        return;
+                    }
+
+                    // Get current user ID
+                    const user = window.auth.getCurrentUser();
+                    if (!user) {
+                        alert('Error: No se pudo identificar al usuario administrador.');
+                        return;
+                    }
+
+                    const roomData = {
+                        nombre: name,
+                        tipo: type,
+                        descripcion: desc,
+                        capacidad: parseInt(cap),
+                        imagen: '/img/default-room.jpg', // Default image
+                        equipamiento: ['WiFi', 'Pizarra'], // Default equipment
+                        userId: user.uid // Send User ID for admin verification
+                    };
+
+                    try {
+                        const result = await window.api.crearSala(roomData);
+                        if (result.success) {
+                            alert('Sala creada exitosamente');
+                            closeModal();
+                            initSalasPage(); // Reload list
+                        } else {
+                            alert('Error al crear sala: ' + result.message);
+                        }
+                    } catch (error) {
+                        console.error('Error creating room:', error);
+                        alert('Error al crear sala: ' + error.message);
+                    }
+                });
             }
         });
     </script>

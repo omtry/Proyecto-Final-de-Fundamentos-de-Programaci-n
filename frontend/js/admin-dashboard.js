@@ -82,68 +82,6 @@ async function initDashboard(user) {
 
     calendar.render();
 
-    // Cargar reservas
-    await loadReservations(user.uid);
-
-    // Event Listeners
-    document.getElementById('roomFilter').addEventListener('change', filterReservations);
-    document.getElementById('refreshBtn').addEventListener('click', () => loadReservations(user.uid));
-
-    // Modal listeners
-    document.getElementById('closeModal').addEventListener('click', closeModal);
-    document.getElementById('cancelBtn').addEventListener('click', closeModal);
-    document.getElementById('deleteBtn').addEventListener('click', handleDeleteReservation);
-    document.getElementById('saveBtn').addEventListener('click', handleSaveReservation);
-}
-
-async function loadReservations(userId) {
-    try {
-        const response = await window.api.getAllReservations(userId);
-        if (response.success) {
-            allReservations = response.data;
-            updateCalendarEvents(allReservations);
-        }
-    } catch (error) {
-        console.error('Error loading reservations:', error);
-        alert('Error al cargar las reservas');
-    }
-}
-
-function updateCalendarEvents(reservations) {
-    const events = reservations.map(reserva => ({
-        id: reserva.id,
-        title: `${reserva.salaNombre} - ${reserva.userName}`,
-        start: `${reserva.fecha}T${reserva.horario}`,
-        end: `${reserva.fecha}T${reserva.horaFin}`,
-        backgroundColor: salaColors[reserva.salaId] || '#3788d8',
-        borderColor: salaColors[reserva.salaId] || '#3788d8',
-        extendedProps: {
-            ...reserva
-        }
-    }));
-
-    calendar.removeAllEvents();
-    calendar.addEventSource(events);
-}
-
-function populateRoomFilter() {
-    const select = document.getElementById('roomFilter');
-    salas.forEach(sala => {
-        const option = document.createElement('option');
-        option.value = sala.id;
-        option.textContent = sala.nombre;
-        select.appendChild(option);
-    });
-}
-
-function populateRoomSelect() {
-    const select = document.getElementById('editSala');
-    salas.forEach(sala => {
-        const option = document.createElement('option');
-        option.value = sala.id;
-        option.textContent = sala.nombre;
-        select.appendChild(option);
-    });
 }
 
 function filterReservations() {
